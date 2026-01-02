@@ -1,3 +1,4 @@
+import os
 from playwright.async_api import async_playwright
 
 class Robot:
@@ -8,6 +9,7 @@ class Robot:
         self.__playwright = None
 
     async def run(self):
+
         self.__playwright = await async_playwright().start()
 
         self.__browser = await self.__playwright.chromium.launch(headless=False)
@@ -27,5 +29,8 @@ class Robot:
     async def screenshot(self, path: str) -> None:
         if self.__page:
             await self.__page.screenshot(path=path)
+
+    def get_pid(self) -> int:
+        return os.getpid()
 
 __ALL__ = ["Robot"]

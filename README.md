@@ -237,3 +237,17 @@ Screenshots are saved inside the container. To access them, you can:
 
 This project is open source and available under the MIT License.
 # RobotCasino-Robots
+
+## Commands
+
+- `screenshot <path>`: Take a screenshot of the robot's current view and save it to `<path>`.
+
+   Example:
+
+   ```bash
+   python main.py screenshot screenshots/robot.png
+   ```
+
+   Notes:
+   - Provide a full or relative filesystem path. Parent directories should be created beforehand.
+   - Supported image formats depend on your environment (PNG/JPEG typically supported).
