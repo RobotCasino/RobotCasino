@@ -9,7 +9,6 @@ class Robot:
         self.__playwright = None
 
     async def run(self):
-
         self.__playwright = await async_playwright().start()
 
         self.__browser = await self.__playwright.chromium.launch(headless=False)
