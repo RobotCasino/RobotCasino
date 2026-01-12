@@ -1,7 +1,7 @@
 import os
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright as _async_playwright
 
-class Robot:
+class Scraper:
     
     def __init__(self) -> None:
         self.__browser = None
@@ -9,7 +9,7 @@ class Robot:
         self.__playwright = None
 
     async def run(self):
-        self.__playwright = await async_playwright().start()
+        self.__playwright = await _async_playwright().start()
 
         self.__browser = await self.__playwright.chromium.launch(headless=False)
 
@@ -17,8 +17,8 @@ class Robot:
 
         await self.__page.goto("https://1win.lat/")
 
-        await self.__page.pause()
 
+        await self.__page.pause()
     async def close(self):
         if self.__browser:
             await self.__browser.close()
@@ -31,5 +31,5 @@ class Robot:
 
     def get_pid(self) -> int:
         return os.getpid()
-
-__ALL__ = ["Robot"]
+    
+__ALL__ = ["Scraper"]
