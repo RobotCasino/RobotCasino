@@ -1,0 +1,8 @@
+{
+    "name": "Securest",
+    "description": "A secure betting strategy for Aviator game.",
+    "schema": {
+       "a": "[white_count] >= 5"
+    },
+    "expression": "a"
+}

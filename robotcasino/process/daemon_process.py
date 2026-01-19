@@ -40,7 +40,15 @@ class DaemonProcess:
         signal.signal(signal.SIGTERM, self.handle_terminate)
 
         asyncio.run(self.start_callback())
-
+    
+    @staticmethod
+    def is_running() -> bool:
+        return PID_PATH.is_file()
+    
+    @staticmethod
+    def stop() -> None:
+        pass
+    
     def handle_terminate(self, signum, frame):
         if self.close_callback is not None:
             if asyncio.iscoroutinefunction(self.close_callback):
