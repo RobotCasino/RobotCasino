@@ -1,23 +1,23 @@
 from abc import ABC, abstractmethod
 from playwright.async_api import Page
 
+from robotcasino.casinos.strategier import Strategier
+
 class Game(ABC):
 
     __casino: str
     __name: str
     __url: str
-    __strategy: str
+    __strategy: str = 'default'
 
-    def __init__(self, casino, name, url, strategy):
+    def __init__(self, casino, url, name):
         self.__casino = casino
-        self.__name = name
         self.__url = url
-        self.__strategy = strategy
+        self.__name = name
 
     @abstractmethod
     async def play(self, page: Page):
         pass
-    
 
     def get_name(self):
         return self.__name
@@ -30,3 +30,9 @@ class Game(ABC):
     
     def get_casino(self):
         return self.__casino
+    
+    def set_strategy(self, strategy: str):
+        if not Strategier.is_strategy(self.get_name(), strategy):
+            raise ValueError(f"Strategy {strategy} not found for game {self.get_name()} in casino {self.get_casino()}")
+        
+        self.__strategy = strategy

@@ -1,12 +1,4 @@
-from .game import Game
-from .one_win import Aviator as OneWinAviator
-
-OneWinGames = {
-    'aviator': OneWinAviator,
-}
-
-Games = {
-    'aviator': OneWinAviator,
-}
-
-__ALL__ = ['Game', 'OneWinGames']
+from robotcasino.casinos.game import Game
+from robotcasino.casinos.casino import Casino
+from robotcasino.casinos.strategier import Strategier
+from robotcasino.casinos.strategy import Strategy

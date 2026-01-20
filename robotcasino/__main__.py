@@ -1,37 +1,36 @@
-from ctypes import ArgumentError
-import sys, typer, rich, os, signal
-from rich.console import Console
-import logging
-from tracemalloc import stop
-logger = logging.getLogger(__name__)
-import typing, datetime, multiprocessing
 
+import logging
+import sys, typer, rich, os, signal
+import typing, datetime, multiprocessing
 import robotcasino.casinos as Casinos
-import robotcasino.bootstrap
-from robotcasino.casinos.strategies.strategier import Strategier
-from robotcasino.process.socket_server import SocketServer
+
+from tracemalloc import stop
+
+from robotcasino.casinos import Strategier
+from robotcasino.process import SocketServer
 from robotcasino.scraper import Scraper
 from robotcasino.ipc import Sender
 from robotcasino.process import DaemonProcess
+from robotcasino.bootstrap import get_casino, get_environment
 
 from robotcasino.constants import PID_PATH, SOCKET_PATH
 
+logger = logging.getLogger(__name__)
+
 app = typer.Typer(add_completion=False)
 
-def _run_scraper(fixture: str, casino: typing.Optional[str], strategy: typing.Optional[str]) -> None:
+def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str]) -> None:
     try:
-        strategy = strategy or 'default'
-        casino = casino or 'one_win'
+        strategyName = strategyName or 'default'
+        casinoName = casinoName or 'one_win'
 
-        if fixture not in Casinos.Games:
-            raise ArgumentError(f"Unsupported fixture: {fixture}")
-        
-        if not Strategier.is_strategy(casino, fixture, strategy):
-            raise ArgumentError(f"Unsupported strategy: {strategy} for game: {fixture}")
+        casino = get_casino(casinoName)
 
-        game = Casinos.Games[fixture](strategy)
+        game = casino.get_game(gameName) 
 
-        scraper = Scraper(game)
+        game.set_strategy(strategyName)        
+
+        scraper = Scraper(casino, game)
 
         socketServer = SocketServer(scraper.controller, scraper.run)
         daemon = DaemonProcess(socketServer.loop, scraper.close)
@@ -44,14 +43,17 @@ def _run_scraper(fixture: str, casino: typing.Optional[str], strategy: typing.Op
 @app.command(short_help="Start the Scraper process.")
 def start(fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
     if DaemonProcess.is_running():
-
-        rich.print(":warning: Scraper is already running.")
-        desicion = typer.prompt("Do you want to stop it and start a new one? (y/n)")
-
+        try:
+            rich.print(":warning: Scraper is already running.")
+            desicion = typer.prompt("Do you want to stop it and start a new one? (y/n)")
+        except Exception:
+            os._exit(1)
+        
         if desicion.lower() == 'y':
             stop()
         else:
             return
+
 
     proc = multiprocessing.Process(target=_run_scraper, args=(fixture, casino, strategy))
         

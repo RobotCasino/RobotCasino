@@ -1,2 +1,2 @@
-from .receiver import Receiver, CommandTypeEnum
-from .sender import Sender
+from robotcasino.ipc.receiver import Receiver
+from robotcasino.ipc.sender import Sender

@@ -1,6 +1,4 @@
-# ...existing code...
 import os
-import pathlib
 import signal
 import asyncio
 

@@ -1,19 +1,22 @@
 from asyncio import StreamReader, StreamWriter
 import os
+from typing import Any, cast
 from playwright.async_api import async_playwright as _async_playwright
 import rich
 import rich.box
 import rich.table
 
 from robotcasino.casinos import Game
+from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
 
 class Scraper:
     
-    def __init__(self, game: Game) -> None:
+    def __init__(self, casino: Casino , game: Game) -> None:
         self.__browser = None
         self.__page = None
         self.__playwright = None
+        self.casino = casino
         self.game = game
         
 
@@ -40,6 +43,12 @@ class Scraper:
 
         self.__page = await self.__browser.new_page()
 
+        await self.__page.goto(self.game.get_url())
+
+        await self.__page.context.add_cookies(cast(Any, self.casino.get_cookies()))
+
+        await self.__page.reload()
+
         await self.game.play(self.__page)
         
     async def close(self):
@@ -57,11 +66,10 @@ class Scraper:
         table = rich.table.Table(title="Scraper Status", box=rich.box.ROUNDED, show_edge=True)
         table.add_column("Prop", style="cyan", no_wrap=True)
         table.add_column("Value", style="magenta")
-        table.add_row("Game", self.game.get_name())
-        table.add_row("URL", str(self.game.get_url()))
-        table.add_row("Strategy", str(self.game.get_strategy()))
+        table.add_row("Game", self.game.get_name().capitalize())
+        table.add_row("URL", self.game.get_url())
+        table.add_row("Strategy", self.game.get_strategy().capitalize())
         rich.print(table)
-
 
     def get_pid(self) -> int:
         return os.getpid()

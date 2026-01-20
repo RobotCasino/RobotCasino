@@ -1,12 +1,11 @@
-from asyncio import start_unix_server
-import asyncio
+from asyncio import StreamReader, StreamWriter, gather, start_unix_server
 from typing import Awaitable, Callable
 
 from robotcasino.constants import SOCKET_PATH
 
 class SocketServer:
 
-    def __init__(self, listener: Callable[[asyncio.StreamReader, asyncio.StreamWriter], Awaitable[None] | None], program: Callable[[], Awaitable[None]]):
+    def __init__(self, listener: Callable[[StreamReader, StreamWriter], Awaitable[None] | None], program: Callable[[], Awaitable[None]]):
         self.listener = listener
         self.program = program
     
@@ -16,10 +15,10 @@ class SocketServer:
     async def loop(self):
         SOCKET_PATH.unlink(missing_ok=True)
         
-        server = await asyncio.start_unix_server(self.listener, str(SOCKET_PATH))
-        
+        server = await start_unix_server(self.listener, str(SOCKET_PATH))
+
         try:
-            await asyncio.gather(self.program(), server.serve_forever())
+            await gather(self.program(), server.serve_forever())
         finally:
             server.close()
             

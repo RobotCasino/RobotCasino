@@ -1,3 +1,1 @@
-from .aviator import Aviator
-from .jetx import JetX
-from .lucky_jet import LuckyJet
+from robotcasino.casinos.one_win.games.aviator import Aviator
