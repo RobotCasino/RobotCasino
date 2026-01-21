@@ -6,7 +6,6 @@ import robotcasino.casinos as Casinos
 
 from tracemalloc import stop
 
-from robotcasino.casinos import Strategier
 from robotcasino.process import SocketServer
 from robotcasino.scraper import Scraper
 from robotcasino.ipc import Sender
@@ -79,10 +78,14 @@ def screenshot(path: typing.Annotated[str, typer.Argument()] = ("./" + datetime.
     try:
         sender = Sender(str(SOCKET_PATH))
 
-        sender.send({
+        res = sender.send({
             "cmd": "screenshot",
             "arguments": path,
         })
+
+        if res is not None:
+            rich.print(res.get("result"))
+
     except Exception:
         logger.error("Unable to connect to the Scraper process (screenshot)", exc_info=True)
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
@@ -96,10 +99,27 @@ def status():
             "cmd": "status",
             "arguments": "",
         })
+    except Exception:
+        logger.error("Unable to connect to the Scraper process (status)", exc_info=True)
+        rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
+
+@app.command(short_help="Shows the HTML content of the current page.")
+def html():
+    try:
+        sender = Sender(str(SOCKET_PATH))
+
+        res = sender.send({
+            "cmd": "get_html",
+            "arguments": "",
+        })
+
+        if res is not None:
+            print(res.get("result"))
 
     except Exception:
         logger.error("Unable to connect to the Scraper process (status)", exc_info=True)
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
+
 
 def main():
     app()
