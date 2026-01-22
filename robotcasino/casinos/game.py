@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from playwright.async_api import Page
+from pydoll.browser.tab import Tab
 
 from robotcasino.casinos.strategier import Strategier
 
@@ -16,7 +16,7 @@ class Game(ABC):
         self.__name = name
 
     @abstractmethod
-    async def play(self, page: Page):
+    async def play(self, tab: Tab):
         pass
 
     def get_name(self):
