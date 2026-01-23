@@ -10,6 +10,7 @@ import rich.box
 import rich.table
 import json
 
+from robotcasino.bootstrap import get_chrome_options
 from robotcasino.casinos import Game
 from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
@@ -47,53 +48,15 @@ class Scraper:
             writer.close()
             await writer.wait_closed()
 
-    async def run(self):
-        options = ChromiumOptions()
+    async def run(self):        
+        self.__chrome = Chrome(options=get_chrome_options())
         
-        options.headless = True
-        options.binary_location = "/usr/bin/google-chrome-stable"
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-web-security")
-        options.add_argument("--disable-features=IsolateOrigins,site-per-process")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        
-        options.add_argument("--disable-gpu")
-        options.add_argument("--disable-software-rasterizer")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--disable-plugins")
-        options.add_argument("--disable-background-networking")
-        options.add_argument("--disable-background-timer-throttling")
-        options.add_argument("--disable-backgrounding-occluded-windows")
-        options.add_argument("--disable-breakpad")
-        options.add_argument("--disable-component-extensions-with-background-pages")
-        options.add_argument("--disable-features=TranslateUI,BlinkGenPropertyTrees")
-        options.add_argument("--disable-ipc-flooding-protection")
-        options.add_argument("--disable-renderer-backgrounding")
-        options.add_argument("--enable-features=NetworkService,NetworkServiceInProcess")
-        options.add_argument("--force-color-profile=srgb")
-        options.add_argument("--hide-scrollbars")
-        options.add_argument("--metrics-recording-only")
-        options.add_argument("--mute-audio")
-        
-        # Resource limits
-        options.add_argument("--max-old-space-size=512")
-        options.add_argument("--memory-pressure-off")
-        
-        # Minimal viewport
-        options.add_argument("--window-size=800,600")
-        options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-        
-        self.__chrome = Chrome(options=options)
         await self.__chrome.__aenter__()
         
         self.__tab = await self.__chrome.start()
         
         await self.__tab.set_cookies(cast(Any, self.casino.get_cookies()))
         await self.__tab.go_to(self.game.get_url())
-
-        # Event listeners can be added here if needed
-        # await self.__tab.on("console", lambda msg: print(msg.text, file=sys.stderr))
 
         await asyncio_sleep(5)
 

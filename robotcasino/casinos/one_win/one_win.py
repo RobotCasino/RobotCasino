@@ -14,7 +14,7 @@ class OneWin(Casino):
     __url = 'https://1win.com/'
 
     __games = {
-        'aviator': lambda: Aviator(OneWin.__display_name, 'https://1win.com/casino/play/v_spribe:aviator'),
+        'aviator': lambda: Aviator(OneWin.__name, 'https://1win.com/casino/play/v_spribe:aviator'),
     }
 
     def __init__(self):

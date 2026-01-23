@@ -2,7 +2,6 @@
 import logging
 import sys, typer, rich, os, signal
 import typing, datetime, multiprocessing
-import robotcasino.casinos as Casinos
 
 from tracemalloc import stop
 
@@ -37,6 +36,7 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
         daemon.start()
     except Exception as e:
         logger.error("Failed to start scraper", exc_info=True)
+        
         os._exit(1)
 
 @app.command(short_help="Start the Scraper process.")
