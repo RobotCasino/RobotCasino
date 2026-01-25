@@ -1,10 +1,11 @@
 from asyncio import StreamReader, StreamWriter, sleep as asyncio_sleep
 import os
+from pathlib import Path
+import signal
 import sys
 from time import sleep
 from typing import Any, cast
 from pydoll.browser.chromium import Chrome
-from pydoll.browser.options import ChromiumOptions
 import rich
 import rich.box
 import rich.table
@@ -14,6 +15,7 @@ from robotcasino.bootstrap import get_chrome_options
 from robotcasino.casinos import Game
 from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
+from robotcasino.constants import PID_PATH, SOCKET_PATH
 
 class Scraper:
     
@@ -22,7 +24,6 @@ class Scraper:
         self.__tab = None
         self.casino = casino
         self.game = game
-        
 
     async def controller(self, reader: StreamReader, writer: StreamWriter):
         try:
@@ -57,11 +58,12 @@ class Scraper:
         
         await self.__tab.set_cookies(cast(Any, self.casino.get_cookies()))
         await self.__tab.go_to(self.game.get_url())
-
-        await asyncio_sleep(5)
+        
+        await asyncio_sleep(2)
+        
 
         await self.game.play(self.__tab)
-        
+
     async def close(self):
         if self.__tab:
             try:
@@ -76,7 +78,7 @@ class Scraper:
             except Exception:
                 pass
             self.__chrome = None
-
+            
     async def screenshot(self, path: str) -> str:
         if self.__tab is None:
             return ":warning: Tab is not initialized."
@@ -104,5 +106,10 @@ class Scraper:
     
     def get_pid(self) -> int:
         return os.getpid()
+    
+    def __console_watcher(self, message: Any) -> None:
+        Path("./logs/scraper_console.log").parent.mkdir(parents=True, exist_ok=True)
+        with Path("./logs/scraper_console.log").open("a", encoding="utf-8") as f:
+            f.write(str(message) + "\n")
     
 __ALL__ = ["Scraper"]

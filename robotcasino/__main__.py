@@ -70,8 +70,9 @@ def stop():
     try:
         os.killpg(pid, signal.SIGTERM)
     except ProcessLookupError:
-        pidFile.unlink(missing_ok=True)
         pass
+
+    pidFile.unlink(missing_ok=True)
 
 @app.command(short_help="Take a screenshot and save it to path.")
 def screenshot(path: typing.Annotated[str, typer.Argument()] = ("./" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jpg")):

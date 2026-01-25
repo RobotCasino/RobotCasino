@@ -1,20 +1,17 @@
-(function() {
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList' || mutation.type === 'characterData') {
-                const text = scoresDiv.textContent || scoresDiv.innerText;
-                
-                if (checkPattern(text)) {
-                    betButton.click();
-                    console.log('Bet button clicked via observer');
-                }
-            }
-        });
-    });
+function querySelector(element) {
+    return document.querySelector('iframe').contentWindow.document.body.querySelector(element)
+}
+
+(async function() {
+    const strategy = JSON.parse([strategy]);
+
+    let targetNode = querySelector('.payouts-block');
+
+    while (targetNode == null) {
+     await new Promise(resolve => setTimeout(resolve, 1000));    
     
-    observer.observe(scoresDiv, {
-        childList: true,
-        subtree: true,
-        characterData: true
-    });
+     targetNode = querySelector('.payouts-block');
+    }
+
+    
 })();

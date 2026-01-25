@@ -59,7 +59,7 @@ class DaemonProcess:
 
         if (self.pid is not None):
             os.killpg(int(self.pid), signal.SIGKILL)
-    
+        
     def set_handle_start(self, callback):
         self.start_callback = callback
     
