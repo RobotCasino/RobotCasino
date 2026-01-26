@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from pydoll.browser.tab import Tab
 
 from robotcasino.casinos.strategier import Strategier
+from pydoll.elements.web_element import WebElement
 
 class Game(ABC):
 
@@ -17,6 +18,10 @@ class Game(ABC):
 
     @abstractmethod
     async def play(self, tab: Tab):
+        pass
+
+    @abstractmethod
+    async def __load_strategy(self, iframe: WebElement):
         pass
 
     def get_name(self):

@@ -1,13 +1,12 @@
 import logging
-from os import mkdir
 import os
 from pathlib import Path
-from robotcasino.casinos.casino import Casino
+from robotcasino.casinos import Casino
 from pydoll.browser.options import ChromiumOptions
 
-os.makedirs("./logs", exist_ok=True)
+from robotcasino.constants import ERROR_LOG_PATH
 
-logging.basicConfig(filename=str("./logs/error.log"), level=logging.ERROR)
+logging.basicConfig(filename=str(ERROR_LOG_PATH), level=logging.ERROR)
 
 def get_casino(name: str) -> Casino:
     match name:

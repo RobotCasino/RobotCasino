@@ -1,4 +1,5 @@
 from asyncio import StreamReader, StreamWriter, sleep as asyncio_sleep
+import logging
 import os
 from pathlib import Path
 import signal
@@ -15,8 +16,8 @@ from robotcasino.bootstrap import get_chrome_options
 from robotcasino.casinos import Game
 from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
-from robotcasino.constants import PID_PATH, SOCKET_PATH
-
+from robotcasino.constants import PID_PATH, SOCKET_PATH, CONSOLE_LOG_PATH
+from pydoll.protocol.runtime.events import RuntimeEvent, ConsoleAPICalledEvent, ConsoleAPICalledEventParams
 class Scraper:
     
     def __init__(self, casino: Casino , game: Game) -> None:
@@ -55,13 +56,16 @@ class Scraper:
         await self.__chrome.__aenter__()
         
         self.__tab = await self.__chrome.start()
-        
+
+        await self.__tab.enable_runtime_events()
+
         await self.__tab.set_cookies(cast(Any, self.casino.get_cookies()))
         await self.__tab.go_to(self.game.get_url())
-        
+
+        await self.__tab.on(RuntimeEvent.CONSOLE_API_CALLED, self.__console_watcher)
+
         await asyncio_sleep(2)
         
-
         await self.game.play(self.__tab)
 
     async def close(self):
@@ -107,9 +111,43 @@ class Scraper:
     def get_pid(self) -> int:
         return os.getpid()
     
-    def __console_watcher(self, message: Any) -> None:
-        Path("./logs/scraper_console.log").parent.mkdir(parents=True, exist_ok=True)
-        with Path("./logs/scraper_console.log").open("a", encoding="utf-8") as f:
-            f.write(str(message) + "\n")
+    async def __console_watcher(self, message: dict) -> None:
+        try:
+            params = message.get("params")
+            if not isinstance(params, dict):
+                return
+
+            args = params.get("args")
+            if not isinstance(args, list) or len(args) == 0:
+                return
+
+            first = args[0]
+            if not isinstance(first, dict) or "value" not in first:
+                return
+
+            msg = first['value']
+
+            if msg[0] != "[" or msg[-1] != "]":
+                return
+            
+            command = msg.strip("[]")
+
+            match command:
+                case "stop":
+                    await self.close()
+                    
+                    pid = self.get_pid()
+                    
+                    os.remove(PID_PATH)
+                    os.remove(SOCKET_PATH)
+
+                    try:
+                        os.killpg(pid, signal.SIGTERM)
+                    except Exception:
+                        pass
+
+                    sys.exit(0)
+        except Exception as e:
+            logging.exception("Failed to write to console log")
     
 __ALL__ = ["Scraper"]

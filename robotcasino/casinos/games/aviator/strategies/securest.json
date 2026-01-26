@@ -4,5 +4,8 @@
     "schema": {
        "a": "[purple_count] >= 5"
     },
-    "expression": "a"
+    "expression": "a",
+    "user": {
+        "betAmount": "4.0"
+    }
 }

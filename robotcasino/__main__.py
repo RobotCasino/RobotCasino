@@ -88,7 +88,6 @@ def screenshot(path: typing.Annotated[str, typer.Argument()] = ("./" + datetime.
             rich.print(res.get("result"))
 
     except Exception:
-        logger.error("Unable to connect to the Scraper process (screenshot)", exc_info=True)
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
 
 @app.command(short_help="Shows the status of the Scraper process.")
@@ -101,7 +100,6 @@ def status():
             "arguments": "",
         })
     except Exception:
-        logger.error("Unable to connect to the Scraper process (status)", exc_info=True)
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
 
 @app.command(short_help="Shows the HTML content of the current page.")
@@ -118,7 +116,6 @@ def html():
             print(res.get("result"))
 
     except Exception:
-        logger.error("Unable to connect to the Scraper process (status)", exc_info=True)
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
 
 
