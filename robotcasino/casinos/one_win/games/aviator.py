@@ -1,8 +1,9 @@
 import asyncio
+import json
 
 from pydoll.elements.web_element import WebElement
 
-from robotcasino.bootstrap import get_game_error_script, get_game_js_script
+from robotcasino.bootstrap import get_game_js_script, get_game_utils_script
 from robotcasino.casinos import Game, Strategier
 from pydoll.browser.tab import Tab
 from pydoll.constants import By
@@ -18,25 +19,33 @@ class Aviator(Game):
 
         iframe = await self.__get_iframe(tab)
         
-        asyncio.create_task(self.__load_strategy(iframe))
+        asyncio.create_task(self._load_strategy(iframe))
 
         while True:
             await asyncio.sleep(3600)
 
-    async def __load_strategy(self, iframe: WebElement):
-        error = get_game_error_script()
+    async def _load_strategy(self, iframe: WebElement):
+        utils = get_game_utils_script()
+        
         script = get_game_js_script(self.get_casino(), self.get_name())
 
-        script = script.replace('[strategy]', Strategier.get_strategy_as_string(self.get_name(), self.get_strategy()))
+        strategy = Strategier.get_strategy_as_dict(self.get_name(), self.get_strategy())
 
-        await iframe.execute_script(error)
+        strategy['user'] = {
+            'betAmount': self.get_user_data().get('amount', '3.0'),
+            'autoWithdrawal': self.get_user_data().get('auto', '1.5')
+        }
+
+        script = script.replace('[strategy]', json.dumps(strategy))
+
+        await iframe.execute_script(utils)
         await iframe.execute_script(script)
     
     async def __select_and_init_game(self, tab: Tab):      
         play_btn = await tab.find_or_wait_element(
             by=By.CSS_SELECTOR,
             value='button.base_root-9EwpE.base_size-xl-9EwpE.base_variant-primary-9EwpE',
-            timeout=120,
+            timeout=280,
             raise_exc=True
         )
 

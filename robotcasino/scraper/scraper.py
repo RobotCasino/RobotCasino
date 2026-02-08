@@ -1,9 +1,6 @@
 from asyncio import StreamReader, StreamWriter, sleep as asyncio_sleep
-import logging
-import os
-from pathlib import Path
-import signal
-import sys
+import re
+import os, signal
 from time import sleep
 from typing import Any, cast
 from pydoll.browser.chromium import Chrome
@@ -16,8 +13,11 @@ from robotcasino.bootstrap import get_chrome_options
 from robotcasino.casinos import Game
 from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
-from robotcasino.constants import PID_PATH, SOCKET_PATH, CONSOLE_LOG_PATH
-from pydoll.protocol.runtime.events import RuntimeEvent, ConsoleAPICalledEvent, ConsoleAPICalledEventParams
+from robotcasino.constants import PID_PATH, SOCKET_PATH
+from pydoll.protocol.runtime.events import RuntimeEvent
+
+from robotcasino.jarvis import Jarvis
+
 class Scraper:
     
     def __init__(self, casino: Casino , game: Game) -> None:
@@ -55,7 +55,7 @@ class Scraper:
         
         await self.__chrome.__aenter__()
         
-        self.__tab = await self.__chrome.start()
+        self.__tab = await self.__chrome.start(headless=True)
 
         await self.__tab.enable_runtime_events()
 
@@ -126,11 +126,15 @@ class Scraper:
                 return
 
             msg = first['value']
-
-            if msg[0] != "[" or msg[-1] != "]":
-                return
             
-            command = msg.strip("[]")
+            pattern = r'\[([^\]]+)\]'
+
+            match = re.match(pattern, msg)
+            
+            if not match:
+                return
+
+            command = match.group(1)
 
             match command:
                 case "stop":
@@ -145,9 +149,12 @@ class Scraper:
                         os.killpg(pid, signal.SIGTERM)
                     except Exception:
                         pass
+                case "log":
+                        log_message = msg[5:].strip()
 
-                    sys.exit(0)
+                        Jarvis.info(log_message)
+
         except Exception as e:
-            logging.exception("Failed to write to console log")
+            Jarvis.error("Failed to write to console log")
     
 __ALL__ = ["Scraper"]

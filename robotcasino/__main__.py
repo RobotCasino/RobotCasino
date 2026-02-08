@@ -1,10 +1,10 @@
 
-import logging
 import sys, typer, rich, os, signal
 import typing, datetime, multiprocessing
 
 from tracemalloc import stop
 
+from robotcasino.jarvis import Jarvis
 from robotcasino.process import SocketServer
 from robotcasino.scraper import Scraper
 from robotcasino.ipc import Sender
@@ -13,11 +13,9 @@ from robotcasino.bootstrap import get_casino, get_environment
 
 from robotcasino.constants import PID_PATH, SOCKET_PATH
 
-logger = logging.getLogger(__name__)
-
 app = typer.Typer(add_completion=False)
 
-def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str]) -> None:
+def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str], extra_params: dict) -> None:
     try:
         strategyName = strategyName or 'default'
         casinoName = casinoName or 'one_win'
@@ -26,7 +24,9 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
 
         game = casino.get_game(gameName) 
 
-        game.set_strategy(strategyName)        
+        game.set_strategy(strategyName)
+
+        game.set_user_data(extra_params)
 
         scraper = Scraper(casino, game)
 
@@ -35,26 +35,43 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
 
         daemon.start()
     except Exception as e:
-        logger.error("Failed to start scraper", exc_info=True)
+        Jarvis.error("Failed to start scraper")
         
         os._exit(1)
 
-@app.command(short_help="Start the Scraper process.")
-def start(fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    short_help="Start the Scraper process."
+)
+def start(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
     if DaemonProcess.is_running():
         try:
             rich.print(":warning: Scraper is already running.")
             desicion = typer.prompt("Do you want to stop it and start a new one? (y/n)")
         except Exception:
             os._exit(1)
-        
         if desicion.lower() == 'y':
             stop()
         else:
             return
-
-
-    proc = multiprocessing.Process(target=_run_scraper, args=(fixture, casino, strategy))
+    
+    extra_params = {}
+    if ctx.args:
+        i = 0
+        while i < len(ctx.args):
+            arg = ctx.args[i]
+            if arg.startswith('--'):
+                key = arg.lstrip('--')
+                if i + 1 < len(ctx.args) and not ctx.args[i + 1].startswith('--'):
+                    extra_params[key] = ctx.args[i + 1]
+                    i += 2
+                else:
+                    extra_params[key] = True
+                    i += 1
+            else:
+                i += 1
+    
+    proc = multiprocessing.Process(target=_run_scraper, args=(fixture, casino, strategy, extra_params))
         
     proc.start()
 

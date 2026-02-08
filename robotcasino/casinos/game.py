@@ -10,6 +10,7 @@ class Game(ABC):
     __name: str
     __url: str
     __strategy: str = 'default'
+    __user_data: dict = {}
 
     def __init__(self, casino, url, name):
         self.__casino = casino
@@ -21,7 +22,7 @@ class Game(ABC):
         pass
 
     @abstractmethod
-    async def __load_strategy(self, iframe: WebElement):
+    async def _load_strategy(self, iframe: WebElement):
         pass
 
     def get_name(self):
@@ -35,6 +36,12 @@ class Game(ABC):
     
     def get_casino(self):
         return self.__casino
+    
+    def get_user_data(self):
+        return self.__user_data
+    
+    def set_user_data(self, data: dict):
+        self.__user_data = data
     
     def set_strategy(self, strategy: str):
         if not Strategier.is_strategy(self.get_name(), strategy):

@@ -1,11 +1,6 @@
 {
     "name": "Securest",
     "description": "A secure betting strategy for Aviator game.",
-    "schema": {
-       "a": "[purple_count] >= 5"
-    },
-    "expression": "a",
-    "user": {
-        "betAmount": "4.0"
-    }
+    "method": "simple",
+    "operation": "[blue_count] >= 5"
 }

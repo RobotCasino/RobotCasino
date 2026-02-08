@@ -9,7 +9,8 @@ class Strategier:
 
         return path.is_file()
     
-    def __get_strategy_as_dict(self, game: str, strategy: str) -> dict:
+    @staticmethod
+    def get_strategy_as_dict(game: str, strategy: str) -> dict:
         path = Path(f"./robotcasino/casinos/games/{game.lower()}/strategies/{strategy.lower()}.json")
 
         if not path.is_file():

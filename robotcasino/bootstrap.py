@@ -6,8 +6,6 @@ from pydoll.browser.options import ChromiumOptions
 
 from robotcasino.constants import ERROR_LOG_PATH
 
-logging.basicConfig(filename=str(ERROR_LOG_PATH), level=logging.ERROR)
-
 def get_casino(name: str) -> Casino:
     match name:
         case 'one_win':
@@ -36,6 +34,7 @@ def get_chrome_binary_path() -> str:
 def get_chrome_options() -> ChromiumOptions:
     chrome_options = ChromiumOptions()
 
+    chrome_options._start_timeout = 120
     chrome_options.headless = False
     chrome_options.binary_location = get_chrome_binary_path()
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -58,8 +57,8 @@ def get_game_js_script(casino: str, game: str) -> str:
     
     return script
 
-def get_game_error_script() -> str:
-    return Path("./robotcasino/casinos/games/error.js").read_text(encoding='utf-8')
+def get_game_utils_script() -> str:
+    return Path("./robotcasino/casinos/games/utils.js").read_text(encoding='utf-8')
 
 def get_game_error_listener_script() -> str:
     return Path("./robotcasino/casinos/games/error-listener.js").read_text(encoding='utf-8')
