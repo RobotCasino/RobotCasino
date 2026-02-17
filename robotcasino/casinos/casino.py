@@ -4,7 +4,6 @@ from robotcasino.casinos import game
 from robotcasino.casinos.game import Game
 
 class Casino():
-
     def __init__(self, name: str, url: str, games: dict[str, Callable]):
         self._name = name
         self._url = url

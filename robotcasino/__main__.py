@@ -4,6 +4,7 @@ import typing, datetime, multiprocessing
 
 from tracemalloc import stop
 
+from robotcasino.casinos import Magnater
 from robotcasino.jarvis import Jarvis
 from robotcasino.process import SocketServer
 from robotcasino.scraper import Scraper
@@ -20,7 +21,7 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
         strategyName = strategyName or 'default'
         casinoName = casinoName or 'one_win'
 
-        casino = get_casino(casinoName)
+        casino = Magnater.get_casino(casinoName)
 
         game = casino.get_game(gameName) 
 
@@ -35,8 +36,8 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
 
         daemon.start()
     except Exception as e:
-        Jarvis.error("Failed to start scraper")
-        
+        Jarvis.error(str(e), e)
+
         os._exit(1)
 
 @app.command(

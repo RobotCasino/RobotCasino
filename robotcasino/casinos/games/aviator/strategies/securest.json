@@ -1,6 +1,0 @@
-{
-    "name": "Securest",
-    "description": "A secure betting strategy for Aviator game.",
-    "method": "simple",
-    "operation": "[blue_count] >= 5"
-}

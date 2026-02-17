@@ -1,10 +1,7 @@
-import logging
 import os
-from pathlib import Path
 from robotcasino.casinos import Casino
 from pydoll.browser.options import ChromiumOptions
-
-from robotcasino.constants import ERROR_LOG_PATH
+from robotcasino.constants import BASE_DIR
 
 def get_casino(name: str) -> Casino:
     match name:
@@ -51,17 +48,3 @@ def get_chrome_options() -> ChromiumOptions:
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
     return chrome_options
-
-def get_game_js_script(casino: str, game: str) -> str:
-    script = Path(f"./robotcasino/casinos/{casino}/scripts/{game}.js").read_text(encoding='utf-8')
-    
-    return script
-
-def get_game_utils_script() -> str:
-    return Path("./robotcasino/casinos/games/utils.js").read_text(encoding='utf-8')
-
-def get_game_error_listener_script() -> str:
-    return Path("./robotcasino/casinos/games/error-listener.js").read_text(encoding='utf-8')
-
-def get_cdp_response(response) -> str:
-    return response['result']['result']['value']

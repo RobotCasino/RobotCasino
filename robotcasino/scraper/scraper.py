@@ -15,7 +15,6 @@ from robotcasino.casinos.casino import Casino
 from robotcasino.ipc.receiver import Receiver
 from robotcasino.constants import PID_PATH, SOCKET_PATH
 from pydoll.protocol.runtime.events import RuntimeEvent
-
 from robotcasino.jarvis import Jarvis
 
 class Scraper:
@@ -55,7 +54,7 @@ class Scraper:
         
         await self.__chrome.__aenter__()
         
-        self.__tab = await self.__chrome.start(headless=True)
+        self.__tab = await self.__chrome.start()
 
         await self.__tab.enable_runtime_events()
 

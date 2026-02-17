@@ -3,7 +3,6 @@ from robotcasino.bootstrap import get_environment
 from robotcasino.browser import Cookie
 from robotcasino.casinos import Casino
 from robotcasino.casinos.one_win.games import Aviator
-
 from time import time
 
 class OneWin(Casino):
