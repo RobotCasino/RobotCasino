@@ -1,2 +1,3 @@
 from robotcasino.process.daemon_process import DaemonProcess
+from robotcasino.process.foreground_process import ForegroundProcess
 from robotcasino.process.socket_server import SocketServer

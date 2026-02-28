@@ -28,11 +28,13 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
+ENV DOCKER=1
 
 COPY . .
 
 RUN pip install --no-cache-dir .
 
-EXPOSE 8000
+VOLUME /app/output
 
 ENTRYPOINT ["robotcasino"]
+CMD ["run"]

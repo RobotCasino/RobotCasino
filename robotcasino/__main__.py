@@ -9,12 +9,12 @@ from robotcasino.jarvis import Jarvis
 from robotcasino.process import SocketServer
 from robotcasino.scraper import Scraper
 from robotcasino.ipc import Sender
-from robotcasino.process import DaemonProcess
+from robotcasino.process import DaemonProcess, ForegroundProcess
 from robotcasino.bootstrap import get_casino, get_environment
-
-from robotcasino.constants import PID_PATH, SOCKET_PATH
+from robotcasino.constants import PID_PATH, SOCKET_PATH, OUTPUT_DIR
 
 app = typer.Typer(add_completion=False)
+
 
 def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str], extra_params: dict) -> None:
     try:
@@ -32,30 +32,15 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
         scraper = Scraper(casino, game)
 
         socketServer = SocketServer(scraper.controller, scraper.run)
-        daemon = DaemonProcess(socketServer.loop, scraper.close)
 
-        daemon.start()
+        return socketServer, scraper
     except Exception as e:
         Jarvis.error(str(e), e)
 
         os._exit(1)
 
-@app.command(
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    short_help="Start the Scraper process."
-)
-def start(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
-    if DaemonProcess.is_running():
-        try:
-            rich.print(":warning: Scraper is already running.")
-            desicion = typer.prompt("Do you want to stop it and start a new one? (y/n)")
-        except Exception:
-            os._exit(1)
-        if desicion.lower() == 'y':
-            stop()
-        else:
-            return
-    
+
+def _parse_extra_params(ctx: typer.Context) -> dict:
     extra_params = {}
     if ctx.args:
         i = 0
@@ -71,10 +56,49 @@ def start(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer
                     i += 1
             else:
                 i += 1
+    return extra_params
+
+
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    short_help="Run the Scraper in foreground mode (Docker-compatible)."
+)
+def run(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
+    """Run the scraper in the foreground. This is the recommended mode for Docker containers."""
+    extra_params = _parse_extra_params(ctx)
+
+    socketServer, scraper = _run_scraper(fixture, casino, strategy, extra_params)
+
+    process = ForegroundProcess(socketServer.loop, scraper.close)
+
+    Jarvis.info(f"Starting scraper in foreground mode — game={fixture}, casino={casino or 'one_win'}, strategy={strategy or 'default'}")
+
+    process.start()
+
+
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    short_help="Start the Scraper as a background daemon (not for Docker)."
+)
+def start(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
+    """Start the scraper as a background daemon. Not compatible with Docker — use 'run' instead."""
+    if DaemonProcess.is_running():
+        try:
+            rich.print(":warning: Scraper is already running.")
+            desicion = typer.prompt("Do you want to stop it and start a new one? (y/n)")
+        except Exception:
+            os._exit(1)
+        if desicion.lower() == 'y':
+            stop()
+        else:
+            return
     
-    proc = multiprocessing.Process(target=_run_scraper, args=(fixture, casino, strategy, extra_params))
-        
-    proc.start()
+    extra_params = _parse_extra_params(ctx)
+
+    socketServer, scraper = _run_scraper(fixture, casino, strategy, extra_params)
+
+    daemon = DaemonProcess(socketServer.loop, scraper.close)
+    daemon.start()
 
 @app.command(short_help="Stop the Scraper process.")
 def stop():
@@ -93,7 +117,11 @@ def stop():
     pidFile.unlink(missing_ok=True)
 
 @app.command(short_help="Take a screenshot and save it to path.")
-def screenshot(path: typing.Annotated[str, typer.Argument()] = ("./" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jpg")):
+def screenshot(path: typing.Annotated[str, typer.Argument()] = None):
+    if path is None:
+        filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
+        path = str(OUTPUT_DIR / filename)
+
     try:
         sender = Sender(str(SOCKET_PATH))
 
@@ -113,10 +141,13 @@ def status():
     try:
         sender = Sender(str(SOCKET_PATH))
 
-        sender.send({
+        res = sender.send({
             "cmd": "status",
             "arguments": "",
         })
+
+        if res is not None:
+            rich.print(res.get("result"))
     except Exception:
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
 

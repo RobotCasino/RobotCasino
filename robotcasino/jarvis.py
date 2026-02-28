@@ -1,7 +1,26 @@
 import datetime
+import logging
+import sys
 from typing import Optional
 
 from robotcasino.constants import CONSOLE_LOG_PATH, ERROR_LOG_PATH
+
+# Configure the root logger for stdout/stderr output
+_stream_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+
+_console_handler = logging.StreamHandler(sys.stdout)
+_console_handler.setLevel(logging.DEBUG)
+_console_handler.setFormatter(_stream_formatter)
+
+_stderr_handler = logging.StreamHandler(sys.stderr)
+_stderr_handler.setLevel(logging.ERROR)
+_stderr_handler.setFormatter(_stream_formatter)
+
+_logger = logging.getLogger("robotcasino")
+_logger.setLevel(logging.DEBUG)
+_logger.addHandler(_console_handler)
+_logger.addHandler(_stderr_handler)
+
 
 class Jarvis:
     @staticmethod
@@ -9,8 +28,13 @@ class Jarvis:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] [{level}] {message}\n"
 
+        # Write to log file
         with open(CONSOLE_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(log_entry)
+
+        # Write to stdout via logging
+        log_level = getattr(logging, level.upper(), logging.INFO)
+        _logger.log(log_level, message)
 
     @staticmethod
     def log_error(error: str, exception: Optional[Exception] = None) -> None:
@@ -22,8 +46,15 @@ class Jarvis:
             tb = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
             log_entry += f"Traceback:\n{tb}\n"
 
+        # Write to error log file
         with open(ERROR_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(log_entry)
+
+        # Write to stderr via logging
+        if exception:
+            _logger.error(error, exc_info=exception)
+        else:
+            _logger.error(error)
 
     @staticmethod
     def debug(message: str) -> None:

@@ -6,6 +6,7 @@ class SimpleStrategy {
         this.controlTab = null
         this.strategy = JSON.parse(strategy)
 
+
         this.blueCount = 0
         this.purpleCount = 0
         this.pinkCount = 0

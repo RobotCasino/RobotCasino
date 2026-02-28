@@ -1,7 +1,7 @@
 import os
 from robotcasino.casinos import Casino
 from pydoll.browser.options import ChromiumOptions
-from robotcasino.constants import BASE_DIR
+from robotcasino.constants import BASE_DIR, IS_DOCKER
 
 def get_casino(name: str) -> Casino:
     match name:
@@ -32,7 +32,6 @@ def get_chrome_options() -> ChromiumOptions:
     chrome_options = ChromiumOptions()
 
     chrome_options._start_timeout = 120
-    chrome_options.headless = False
     chrome_options.binary_location = get_chrome_binary_path()
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-software-rasterizer")
@@ -46,5 +45,11 @@ def get_chrome_options() -> ChromiumOptions:
     chrome_options.add_argument("--mute-audio")
     chrome_options.add_argument("--window-size=1360,600")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+    if IS_DOCKER:
+        chrome_options.headless = True
+        chrome_options.add_argument("--no-sandbox")
+    else:
+        chrome_options.headless = False
 
     return chrome_options

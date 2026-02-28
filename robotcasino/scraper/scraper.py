@@ -4,9 +4,6 @@ import os, signal
 from time import sleep
 from typing import Any, cast
 from pydoll.browser.chromium import Chrome
-import rich
-import rich.box
-import rich.table
 import json
 
 from robotcasino.bootstrap import get_chrome_options
@@ -36,7 +33,7 @@ class Scraper:
 
             match command:
                 case "status":
-                    self.status()
+                    res = self.status()
                 case "screenshot":
                   res = await self.screenshot(arg)
                 case "get_html":
@@ -87,7 +84,7 @@ class Scraper:
             return ":warning: Tab is not initialized."
         
         await self.__tab.take_screenshot(path=path)
-        return f":camera: Screenshot saved to [bold]{path}[/bold]"
+        return f":camera: Screenshot saved to {path}"
     
     async def get_html(self) -> str:
         if self.__tab is None:
@@ -97,15 +94,14 @@ class Scraper:
 
         return html
     
-    def status(self) -> None:
-        table = rich.table.Table(title="Scraper Status", box=rich.box.ROUNDED, show_edge=True)
-        table.add_column("Prop", style="cyan", no_wrap=True)
-        table.add_column("Value", style="magenta")
-        table.add_row("Game", self.game.get_name().capitalize())
-        table.add_row("URL", self.game.get_url())
-        table.add_row("Strategy", self.game.get_strategy().capitalize())
-      
-        rich.print(table)
+    def status(self) -> str:
+        lines = []
+        lines.append("╭─ Scraper Status ─╮")
+        lines.append(f"  Game:     {self.game.get_name().capitalize()}")
+        lines.append(f"  URL:      {self.game.get_url()}")
+        lines.append(f"  Strategy: {self.game.get_strategy().capitalize()}")
+        lines.append("╰───────────────────╯")
+        return "\n".join(lines)
     
     def get_pid(self) -> int:
         return os.getpid()
