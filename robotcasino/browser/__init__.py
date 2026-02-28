@@ -1,1 +1,0 @@
-from robotcasino.browser.cookie import Cookie

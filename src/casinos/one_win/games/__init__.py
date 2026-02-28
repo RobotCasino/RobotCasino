@@ -1,0 +1,1 @@
+from src.casinos.one_win.games.aviator import Aviator

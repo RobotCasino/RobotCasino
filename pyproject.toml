@@ -17,7 +17,15 @@ dependencies = [
 ]
 
 [project.scripts]
-robotcasino = "robotcasino.__main__:main"
+robotcasino = "src.__main__:main"
+
+[tool.setuptools.package-data]
+src = ["casinos/games/**/*.json", "casinos/games/**/*.js"]
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.4",
+]

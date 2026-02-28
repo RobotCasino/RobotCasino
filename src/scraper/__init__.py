@@ -1,0 +1,1 @@
+from src.scraper.scraper import Scraper

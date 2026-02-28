@@ -23,12 +23,14 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+uv.lock 
 
 # Virtual environments
 venv/
 ENV/
 env/
 .venv
+.robotcasino-env
 
 # IDEs
 .vscode/
