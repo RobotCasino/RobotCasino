@@ -17,7 +17,7 @@ app = typer.Typer(add_completion=False)
 
 def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str], extra_params: dict) -> None:
     try:
-        strategyName = strategyName or 'default'
+        strategyName = strategyName
         casinoName = casinoName or 'one_win'
 
         casino = Magnater.get_casino(casinoName)
@@ -70,7 +70,7 @@ def run(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.O
 
     process = ForegroundProcess(socketServer.loop, scraper.close)
 
-    headless = get_environment('HEADLESS', '1')
+    headless = get_environment('HEADLESS')
     mode = 'GUI' if headless == '0' else 'Headless'
 
     Jarvis.info(f"Starting scraper in {mode} mode — game={fixture}, casino={casino or 'one_win'}, strategy={strategy or 'default'}, mode={mode}")

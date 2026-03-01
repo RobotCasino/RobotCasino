@@ -64,7 +64,9 @@ class Strategier:
 
         strategy_data['user'] = {
             'betAmount': safe_user_data.get('amount', '3.0'),
-            'autoWithdrawal': safe_user_data.get('auto', '1.5')
+            'autoWithdrawal': safe_user_data.get('auto', '1.5'),
+            'martingaleAttempts': safe_user_data.get('martingaleAttempts', 3),
+            'martingaleMultiplier': safe_user_data.get('martingaleMultiplier', 2)
         }
 
         return strategy_data
