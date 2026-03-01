@@ -32,8 +32,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
-ENV DOCKER=1
-ENV DISPLAY=:0
+ENV HEADLESS=1
 
 COPY . .
 
@@ -41,6 +40,6 @@ RUN pip install --no-cache-dir .
 
 VOLUME /app/output
 
-# ENTRYPOINT ["robotcasino"]
-# CMD ["run"]
+ENTRYPOINT ["robotcasino"]
+CMD ["run"]
 

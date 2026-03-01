@@ -20,7 +20,7 @@ dependencies = [
 robotcasino = "src.__main__:main"
 
 [tool.setuptools.package-data]
-src = ["casinos/games/**/*.json", "casinos/games/**/*.js"]
+src = ["casinos/**/*.json", "casinos/**/*.js"]
 
 [tool.setuptools.packages.find]
 where = ["."]

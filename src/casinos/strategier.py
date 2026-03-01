@@ -74,4 +74,7 @@ class Strategier:
         script = Strategier.get_strategy_script(game, strategy)
         strategy_data = Strategier.build_strategy_with_user(game, strategy, user_data)
 
-        return script.replace('[strategy]', json.dumps(strategy_data))
+        json_str = json.dumps(strategy_data)
+        
+        escaped_for_js = json.dumps(json_str)[1:-1]
+        return script.replace('[strategy]', escaped_for_js)

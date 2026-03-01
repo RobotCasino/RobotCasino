@@ -7,7 +7,9 @@ PROJECT_DIR = BASE_DIR.parent
 IS_HEADLESS = os.environ.get("HEADLESS", "0") == "1"
 
 LOGS_DIR = PROJECT_DIR / "logs"
-OUTPUT_DIR = pathlib.Path("/app/output")
+
+IS_DOCKER = pathlib.Path("/app").exists() and pathlib.Path("/.dockerenv").exists()
+OUTPUT_DIR = pathlib.Path("/app/output") if IS_DOCKER else PROJECT_DIR / "output"
 
 os.makedirs(LOGS_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)

@@ -1,7 +1,7 @@
 from asyncio import StreamReader, StreamWriter, sleep as asyncio_sleep
 import re
-import os, signal
-from time import sleep
+import os
+
 from typing import Any, cast
 from pydoll.browser.chromium import Chrome
 import json
@@ -11,6 +11,7 @@ from src.casinos import Game
 from src.casinos.casino import Casino
 from src.ipc.receiver import Receiver
 from src.constants import PID_PATH, SOCKET_PATH
+
 from pydoll.protocol.runtime.events import RuntimeEvent
 from src.jarvis import Jarvis
 
@@ -103,9 +104,7 @@ class Scraper:
         lines.append("╰───────────────────╯")
         return "\n".join(lines)
     
-    def get_pid(self) -> int:
-        return os.getpid()
-    
+
     async def __console_watcher(self, message: dict) -> None:
         try:
             params = message.get("params")
@@ -134,16 +133,10 @@ class Scraper:
             match command:
                 case "stop":
                     await self.close()
-                    
-                    pid = self.get_pid()
-                    
-                    os.remove(PID_PATH)
-                    os.remove(SOCKET_PATH)
-
-                    try:
-                        os.killpg(pid, signal.SIGTERM)
-                    except Exception:
-                        pass
+                    SOCKET_PATH.unlink(missing_ok=True)
+                    PID_PATH.unlink(missing_ok=True)
+                    Jarvis.info("Bye, bye!")
+                    os._exit(0)
                 case "log":
                         log_message = msg[5:].strip()
 

@@ -70,7 +70,10 @@ def run(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.O
 
     process = ForegroundProcess(socketServer.loop, scraper.close)
 
-    Jarvis.info(f"Starting scraper in foreground mode — game={fixture}, casino={casino or 'one_win'}, strategy={strategy or 'default'}")
+    headless = get_environment('HEADLESS', '1')
+    mode = 'GUI' if headless == '0' else 'Headless'
+
+    Jarvis.info(f"Starting scraper in {mode} mode — game={fixture}, casino={casino or 'one_win'}, strategy={strategy or 'default'}, mode={mode}")
 
     process.start()
 

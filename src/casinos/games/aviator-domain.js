@@ -12,4 +12,4 @@ class AviatorDomain {
     }
 }
 
-window.AviatorDomain = AviatorDomain;fdsfaasdfsdaf
+window._AviatorDomain = AviatorDomain;

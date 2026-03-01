@@ -22,7 +22,7 @@ class OneWin(Casino):
     def get_cookies(self) -> List[Dict[str, Any]]:
         token = Cookie() \
             .set_name("1w_token") \
-            .set_value(get_environment("ONE_WIN_TOKEN")) \
+            .set_value(get_environment("SESSION_TOKEN")) \
             .set_domain(f"{self.__domain}") \
             .set_path("/") \
             .set_expires(time() + 365 * 24 * 3600) \
@@ -35,3 +35,4 @@ class OneWin(Casino):
             token
         ]
     
+__ALL__ = ['OneWin']

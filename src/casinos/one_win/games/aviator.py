@@ -2,6 +2,7 @@ from pydoll.elements.web_element import WebElement
 from src.casinos import Game, Strategier, Scripter
 from pydoll.browser.tab import Tab
 from pydoll.constants import By
+from src.jarvis import Jarvis
 import asyncio
 
 class Aviator(Game):

@@ -1,11 +1,12 @@
-const AviatorDomain = window.AviatorDomain;
-
 class SimpleStrategy {
 
-    constructor(strategy) {
+    constructor() {
         this.controlTab = null
-        this.strategy = JSON.parse(strategy)
+        this.querySelector = null
 
+        this.strategy = JSON.parse("[strategy]")
+
+        this.AviatorDomain = window._AviatorDomain;
 
         this.blueCount = 0
         this.purpleCount = 0
@@ -18,22 +19,24 @@ class SimpleStrategy {
         this.controlTab = controlTab
     }
 
+    setQuerySelector(querySelector) {
+        this.querySelector = querySelector
+    }
+
     _configureControl() {
         this.controlTab.enableAutoCashout(this.strategy.user.autoWithdrawal)
         this.controlTab.setAmount(this.strategy.user.betAmount)
     }
 
-    execute(operation) {
-        if (this.controlTab == null) {
-            
-        }
-
-        const payoutsBlock = querySelector('.payouts-block')
-        const watcher = [...operation.matchAll(/\[(\w+)\]/g)].map(match => match[1])
+    execute() {
+        const payoutsBlock = this.querySelector('.payouts-block')
+        const watcher = [...this.strategy.operation.matchAll(/\[(\w+)\]/g)].map(match => match[1])
 
         if (payoutsBlock == null) {
             throw new Error('Payouts block not found')
         }
+
+        this._configureControl()
 
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -45,21 +48,21 @@ class SimpleStrategy {
                         const parsedMultiplier = parseFloat(multiplier)
                         let multiplierName = null
 
-                        if (isBlue(parsedMultiplier)) {
+                        if (this.AviatorDomain.isBlue(parsedMultiplier)) {
                             this.blueCount++
 
                             multiplierName = 'blue_count'
-                        } else if (isPurple(parsedMultiplier)) {
+                        } else if (this.AviatorDomain.isPurple(parsedMultiplier)) {
                             this.purpleCount++
 
                             multiplierName = 'purple_count'
-                        } else if (isPink(parsedMultiplier)) {
+                        } else if (this.AviatorDomain.isPink(parsedMultiplier)) {
                             this.pinkCount++
 
                             multiplierName = 'pink_count'
                         }
 
-                        const parsedOperation = operation.replace(/\[(\w+)\]/g, (match, key) => {
+                        const parsedOperation = this.strategy.operation.replace(/\[(\w+)\]/g, (match, key) => {
                             switch (key) {
                                 case 'purple_count': return this.purpleCount
                                 case 'blue_count': return this.blueCount
@@ -70,7 +73,7 @@ class SimpleStrategy {
 
                         const result = eval(parsedOperation)
 
-                        if (!result && !watcher.includes(multiplierName)) {                         
+                        if (!result && !watcher.includes(multiplierName)) {
                             this.blueCount = 0
                             this.purpleCount = 0
                             this.pinkCount = 0
@@ -97,3 +100,5 @@ class SimpleStrategy {
         })
     }
 }
+
+window._Strategy = SimpleStrategy

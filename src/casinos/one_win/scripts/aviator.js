@@ -2,6 +2,24 @@ function querySelector(element) {
     return document.querySelector('iframe').contentWindow.document.body.querySelector(element)
 }
 
+function closeChat() {
+    const closeButton = querySelector('.close')
+
+    if (closeButton != null) {
+        closeButton.click()
+    }
+}
+
+async function waitUntilIframeIsReady() {
+    let primaryNode = querySelector('.payouts-block')
+
+    while (primaryNode == null) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        primaryNode = querySelector('.payouts-block')
+    }
+}
+
 class ControlTab {
     constructor(selector) {
         this.control = querySelector(selector)
@@ -65,16 +83,14 @@ class ControlTab {
 }
 
 (async function () {
-    let primaryNode = querySelector('.payouts-block')
+    await waitUntilIframeIsReady()
 
-    while (primaryNode == null) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        primaryNode = querySelector('.payouts-block')
-    }
+    closeChat()
 
     const controlTab = new ControlTab('.bet-control.double-bet')
+    const strategy = new window._Strategy()
 
-    window.strategy.setControl(controlTab)
-    window.strategy.execute()
+    strategy.setControl(controlTab)
+    strategy.setQuerySelector(querySelector)
+    strategy.execute()
 })()
