@@ -1,4 +1,4 @@
-class SimpleStrategy {
+class SimpleStrategy extends Strategy {
 
     constructor() {
         this.controlTab = null
@@ -13,6 +13,12 @@ class SimpleStrategy {
         this.pinkCount = 0
 
         this.watcher = []
+
+        this.states = Object.freeze({
+            WAITING: 'waiting',
+            BET_PLACED: 'bet_placed',
+            CRASHED: 'crashed',
+        })
     }
 
     setControl(controlTab) {
@@ -29,6 +35,8 @@ class SimpleStrategy {
     }
 
     execute() {
+        let state = this.states.WAITING
+
         const payoutsBlock = this.querySelector('.payouts-block')
         const watcher = [...this.strategy.operation.matchAll(/\[(\w+)\]/g)].map(match => match[1])
 
@@ -47,6 +55,9 @@ class SimpleStrategy {
 
                         const parsedMultiplier = parseFloat(multiplier)
                         let multiplierName = null
+
+                        if (state == this.states.BET_PLACED && this.AviatorDomain) {
+                        }
 
                         if (this.AviatorDomain.isBlue(parsedMultiplier)) {
                             this.blueCount++
@@ -87,6 +98,8 @@ class SimpleStrategy {
                         this.blueCount = 0
                         this.purpleCount = 0
                         this.pinkCount = 0
+
+                        state = this.states.BET_PLACED
 
                         window._invokeLogMessage(`Bet placed!`)
                     }
