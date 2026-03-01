@@ -44,7 +44,7 @@ class SimpleStrategy {
         this.pinkCount = 0
     }
 
-    _prunePayouts(container, maxChildren = 50) {
+    _prunePayouts(container, maxChildren = 5) {
         while (container.children.length > maxChildren) {
             container.removeChild(container.firstChild)
         }

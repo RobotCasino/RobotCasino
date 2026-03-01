@@ -5,3 +5,11 @@ window._invokeFatalError = () => {
 window._invokeLogMessage = (msg) => {
     console.log(`[log] ${msg}`)
 }
+
+window._invokeBetMessage = (amount) => {
+    console.log(`[bet] ${amount}`)
+}
+
+window._invokeWaitingMessage = () => {
+    console.log(`[waiting]`)
+}

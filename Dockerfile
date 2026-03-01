@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /app/output
 
 ENV PYTHONUNBUFFERED=1
 ENV HEADLESS=1

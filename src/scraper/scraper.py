@@ -1,4 +1,7 @@
 from asyncio import StreamReader, StreamWriter, sleep as asyncio_sleep
+import asyncio
+import gc
+import logging
 import re
 import os
 
@@ -22,6 +25,8 @@ class Scraper:
         self.__tab = None
         self.casino = casino
         self.game = game
+
+        self.isBetting = False
 
     async def controller(self, reader: StreamReader, writer: StreamWriter):
         try:
@@ -47,7 +52,10 @@ class Scraper:
             writer.close()
             await writer.wait_closed()
 
-    async def run(self):        
+    async def run(self):
+        # Suppress pydoll's verbose DEBUG logging to save memory
+        logging.getLogger('pydoll').setLevel(logging.WARNING)
+
         self.__chrome = Chrome(options=get_chrome_options())
         
         await self.__chrome.__aenter__()
@@ -62,8 +70,40 @@ class Scraper:
         await self.__tab.on(RuntimeEvent.CONSOLE_API_CALLED, self.__console_watcher)
 
         await asyncio_sleep(2)
-        
-        await self.game.play(self.__tab)
+
+        asyncio.get_event_loop().create_task(self._periodic_cleanup())
+
+        reload_interval = 30*60
+        while True:
+            try:
+                play_task = asyncio.create_task(self.game.play(self.__tab))
+                await asyncio.wait_for(asyncio.shield(play_task), timeout=reload_interval)
+            except asyncio.TimeoutError:
+                if self.isBetting:
+                    Jarvis.info("Still betting, skipping reload...")
+                    continue
+                
+                play_task.cancel()
+                try:
+                    await play_task
+                except asyncio.CancelledError:
+                    pass
+
+                Jarvis.info("Reloading page to free memory...")
+
+                try:
+                    await self.__tab._execute_command(
+                        {"method": "Runtime.discardConsoleEntries", "params": {}}
+                    )
+                except Exception:
+                    pass
+
+                await self.__tab.go_to(self.game.get_url())
+                await asyncio_sleep(5)
+
+                gc.collect()
+
+                Jarvis.info("Page reloaded. Restarting game...")
 
     async def close(self):
         if self.__tab:
@@ -79,7 +119,29 @@ class Scraper:
             except Exception:
                 pass
             self.__chrome = None
-            
+
+    async def _periodic_cleanup(self, interval_seconds=120):
+        """Periodically discard Chrome's retained console entries and force GC."""
+        while True:
+            await asyncio_sleep(interval_seconds)
+            try:
+                if self.__tab:
+                    # Discard retained console entries — Chrome holds strong references
+                    # to every object logged via console.log() when Runtime is enabled
+                    await self.__tab._execute_command(
+                        {"method": "Runtime.discardConsoleEntries", "params": {}}
+                    )
+                    # Run JS-side cleanup
+                    await self.__tab.execute_script("""
+                        if (typeof gc === 'function') gc();
+                        performance.clearResourceTimings();
+                        performance.clearMeasures();
+                        performance.clearMarks();
+                    """)
+                gc.collect()
+            except Exception:
+                pass
+
     async def screenshot(self, path: str) -> str:
         if self.__tab is None:
             return ":warning: Tab is not initialized."
@@ -137,10 +199,22 @@ class Scraper:
                     PID_PATH.unlink(missing_ok=True)
                     Jarvis.info("Bye, bye!")
                     os._exit(0)
-                case "log":
-                        log_message = msg[5:].strip()
 
-                        Jarvis.info(log_message)
+                    self.isBetting = False
+                case "log":
+                    log_message = msg[5:].strip()
+
+                    Jarvis.info(log_message)
+
+                    self.isBetting = False
+                case "bet":
+                    amount = msg[5:].strip()
+
+                    Jarvis.info(f"Betting {amount}")
+
+                    self.isBetting = True
+                case "waiting":
+                    self.isBetting = False
 
         except Exception as e:
             Jarvis.error("Failed to write to console log")

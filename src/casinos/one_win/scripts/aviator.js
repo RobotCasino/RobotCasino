@@ -2,11 +2,19 @@ function querySelector(element) {
     return document.querySelector('iframe').contentWindow.document.body.querySelector(element)
 }
 
-function closeChat() {
-    const closeButton = querySelector('.close')
+function removeChat() {
+    const chatBar = querySelector('.chat-bar')
 
-    if (closeButton != null) {
-        closeButton.click()
+    if (chatBar != null) {
+        chatBar.innerHTML = ''
+    }
+}
+
+function removeLeaderboard() {
+    const leaderboard = querySelector('.bets-block')
+
+    if (leaderboard != null) {
+        leaderboard.innerHTML = ''
     }
 }
 
@@ -85,7 +93,8 @@ class ControlTab {
 (async function () {
     await waitUntilIframeIsReady()
 
-    closeChat()
+    removeChat()
+    removeLeaderboard()
 
     const controlTab = new ControlTab('.bet-control.double-bet')
     const strategy = new window._Strategy()

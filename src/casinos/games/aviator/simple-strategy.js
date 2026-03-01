@@ -44,10 +44,12 @@ class SimpleStrategy {
         this.pinkCount = 0
     }
 
-    _prunePayouts(container, maxChildren = 50) {
-        while (container.children.length > maxChildren) {
-            container.removeChild(container.firstChild)
-        }
+    _prunePayouts() {
+        const payoutsFullBlock = this.querySelector('.wrapper .payouts-block')
+        const payoutsInlineBlock = this.querySelector('.payouts-wrapper .payouts-block')
+
+        Array.from(payoutsFullBlock.children).slice(5).forEach(el => el.remove());
+        Array.from(payoutsInlineBlock.children).slice(5).forEach(el => el.remove());
     }
 
     execute() {
@@ -56,6 +58,7 @@ class SimpleStrategy {
         const payoutsBlock = this.querySelector('.payouts-block')
         const scores = [...this.operation.matchAll(/\[(\w+)\]/g)].map(match => match[1])
         let martingaleAttempts = 0
+        let totalLost = 0
         let amount = this.amount
 
         const observer = new MutationObserver((mutations) => {
@@ -68,27 +71,26 @@ class SimpleStrategy {
                         if (this.state == STATES.BET_PLACED) {
                             if (AviatorDomain.getResult(multiplier, this.autoWithdrawal) == 'WON') {
                                 this.state = STATES.WAITING
+                                window._invokeWaitingMessage()
 
                                 martingaleAttempts = 0
+                                totalLost = 0
                                 amount = this.amount
-
-                                window._invokeLogMessage(`Bet won! Resetting to initial amount.`)
                             } else {
                                 if (martingaleAttempts >= this.martingaleAttempts) {
                                     this.state = STATES.WAITING
+                                    window._invokeWaitingMessage()
 
+                                    totalLost = 0
                                     amount = this.amount
                                     martingaleAttempts = 0
-
-                                    window._invokeLogMessage(`Martingale attempts exhausted. Resetting to initial amount.`)
                                 } else {
 
                                     this.state = STATES.CRASHED
 
-                                    amount = parseFloat(this.amount) + parseFloat(amount)
+                                    totalLost += parseFloat(amount)
+                                    amount = totalLost / (parseFloat(this.autoWithdrawal) - 1)
                                     martingaleAttempts++
-
-                                    window._invokeLogMessage(`Martingale attempt ${martingaleAttempts}`)
                                 }
                             }
 
@@ -96,11 +98,11 @@ class SimpleStrategy {
                         }
 
                         if (this.state == STATES.CRASHED) {
-                            window._invokeLogMessage(`Bet placed in Martingale state! Amount: ${amount}`)
 
                             this.controlTab.bet()
 
                             this.state = STATES.BET_PLACED
+                            window._invokeBetMessage(amount)
 
                             return
                         }
@@ -136,16 +138,14 @@ class SimpleStrategy {
                         if (!result && !scores.includes(multiplierName)) {
                             this._resetCounts()
 
-                            window._invokeLogMessage(`Resetting counts!`)
-
                             this.state = STATES.WAITING
+                            window._invokeWaitingMessage()
                         } else if (result) {
                             this.controlTab.bet()
                             this._resetCounts()
 
                             this.state = STATES.BET_PLACED
-
-                            window._invokeLogMessage(`Bet placed!`)
+                            window._invokeBetMessage(amount)
                         }
 
                         this._prunePayouts(payoutsBlock)
