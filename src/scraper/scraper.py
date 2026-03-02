@@ -25,16 +25,12 @@ class Scraper:
         casino: Casino,
         game: Game,
         proxy_server: str | None = None,
-        proxy_username: str | None = None,
-        proxy_password: str | None = None,
     ) -> None:
         self.__chrome = None
         self.__tab = None
         self.casino = casino
         self.game = game
         self.proxy_server = proxy_server
-        self.proxy_username = proxy_username
-        self.proxy_password = proxy_password
 
         self.isBetting = False
 
@@ -69,8 +65,6 @@ class Scraper:
         self.__chrome = Chrome(
             options=get_chrome_options(
                 proxy_server=self.proxy_server,
-                proxy_username=self.proxy_username,
-                proxy_password=self.proxy_password,
             )
         )
         

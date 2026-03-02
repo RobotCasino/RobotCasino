@@ -1,5 +1,4 @@
 import os
-from urllib.parse import quote
 from src.casinos import Casino
 from pydoll.browser.options import ChromiumOptions
 from src.constants import BASE_DIR, IS_HEADLESS
@@ -31,8 +30,6 @@ def get_chrome_binary_path() -> str:
 
 def get_chrome_options(
     proxy_server: str | None = None,
-    proxy_username: str | None = None,
-    proxy_password: str | None = None,
 ) -> ChromiumOptions:
     chrome_options = ChromiumOptions()
 
@@ -64,14 +61,7 @@ def get_chrome_options(
     chrome_options.add_argument("--disk-cache-size=0")
     
     if proxy_server:
-        proxy_value = proxy_server
-        if proxy_username and proxy_password and "@" not in proxy_server:
-            if "://" in proxy_server:
-                scheme, host = proxy_server.split("://", 1)
-            else:
-                scheme, host = "http", proxy_server
-            proxy_value = f"{scheme}://{quote(proxy_username, safe='')}:{quote(proxy_password, safe='')}@{host}"
-        chrome_options.add_argument(f"--proxy-server={proxy_value}")
+        chrome_options.add_argument(f"--proxy-server={proxy_server}")
 
     chrome_options.headless = IS_HEADLESS
 

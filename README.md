@@ -36,5 +36,5 @@ Finally execute the container with the following command:
 ```bash
 docker run --name robotcasino -d -v ./output/:/app/output -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0 -e HEADLESS=0 -e SESSION_TOKEN={session_token} robotcasino run {game} -s {strategy}
 # with proxy:
-docker run --name robotcasino -d -v ./output/:/app/output -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0 -e HEADLESS=0 -e SESSION_TOKEN={session_token} robotcasino run {game} -s {strategy} --proxy-server http://{host}:{port} --proxy-username {user} --proxy-password {password}
+docker run --name robotcasino -d -v ./output/:/app/output -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0 -e HEADLESS=0 -e SESSION_TOKEN={session_token} robotcasino run {game} -s {strategy} --proxy-server http://{host}:{port}
 ```
