@@ -15,7 +15,15 @@ from src.constants import PID_PATH, SOCKET_PATH, OUTPUT_DIR
 
 app = typer.Typer(add_completion=False)
 
-def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: typing.Optional[str], extra_params: dict) -> None:
+def _run_scraper(
+    gameName: str,
+    casinoName: typing.Optional[str],
+    strategyName: typing.Optional[str],
+    extra_params: dict,
+    proxy_server: typing.Optional[str] = None,
+    proxy_username: typing.Optional[str] = None,
+    proxy_password: typing.Optional[str] = None,
+) -> None:
     try:
         strategyName = strategyName
         casinoName = casinoName or 'one_win'
@@ -28,7 +36,13 @@ def _run_scraper(gameName: str, casinoName: typing.Optional[str], strategyName: 
 
         game.set_user_data(extra_params)
 
-        scraper = Scraper(casino, game)
+        scraper = Scraper(
+            casino,
+            game,
+            proxy_server=proxy_server,
+            proxy_username=proxy_username,
+            proxy_password=proxy_password,
+        )
 
         socketServer = SocketServer(scraper.controller, scraper.run)
 
@@ -62,11 +76,27 @@ def _parse_extra_params(ctx: typer.Context) -> dict:
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     short_help="Run the Scraper in foreground mode (Docker-compatible)."
 )
-def run(ctx: typer.Context, fixture: str, casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"), strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper")):
+def run(
+    ctx: typer.Context,
+    fixture: str,
+    casino: typing.Optional[str] = typer.Option(None, "--casino", "-c", help="Optional casino identifier"),
+    strategy: typing.Optional[str] = typer.Option(None, "--strategy", "-s", help="Optional strategy to pass to the scraper"),
+    proxy_server: typing.Optional[str] = typer.Option(None, "--proxy-server", help="Proxy server (example: http://host:port)"),
+    proxy_username: typing.Optional[str] = typer.Option(None, "--proxy-username", help="Proxy username"),
+    proxy_password: typing.Optional[str] = typer.Option(None, "--proxy-password", help="Proxy password"),
+):
     """Run the scraper in the foreground. This is the recommended mode for Docker containers."""
     extra_params = _parse_extra_params(ctx)
 
-    socketServer, scraper = _run_scraper(fixture, casino, strategy, extra_params)
+    socketServer, scraper = _run_scraper(
+        fixture,
+        casino,
+        strategy,
+        extra_params,
+        proxy_server=proxy_server,
+        proxy_username=proxy_username,
+        proxy_password=proxy_password,
+    )
 
     process = ForegroundProcess(socketServer.loop, scraper.close)
 

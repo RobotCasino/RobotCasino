@@ -20,11 +20,21 @@ from src.jarvis import Jarvis
 
 class Scraper:
     
-    def __init__(self, casino: Casino , game: Game) -> None:
+    def __init__(
+        self,
+        casino: Casino,
+        game: Game,
+        proxy_server: str | None = None,
+        proxy_username: str | None = None,
+        proxy_password: str | None = None,
+    ) -> None:
         self.__chrome = None
         self.__tab = None
         self.casino = casino
         self.game = game
+        self.proxy_server = proxy_server
+        self.proxy_username = proxy_username
+        self.proxy_password = proxy_password
 
         self.isBetting = False
 
@@ -56,7 +66,13 @@ class Scraper:
         # Suppress pydoll's verbose DEBUG logging to save memory
         logging.getLogger('pydoll').setLevel(logging.WARNING)
 
-        self.__chrome = Chrome(options=get_chrome_options())
+        self.__chrome = Chrome(
+            options=get_chrome_options(
+                proxy_server=self.proxy_server,
+                proxy_username=self.proxy_username,
+                proxy_password=self.proxy_password,
+            )
+        )
         
         await self.__chrome.__aenter__()
         
