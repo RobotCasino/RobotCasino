@@ -97,7 +97,7 @@ class ControlTab {
     removeLeaderboard()
 
     const controlTab = new ControlTab('.bet-control.double-bet')
-    const strategy = new window._Strategy()
+    const strategy = new window.Strategy()
 
     strategy.setControl(controlTab)
     strategy.setQuerySelector(querySelector)

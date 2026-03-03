@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
-from src.bootstrap import get_environment
-from src.browser import Cookie
-from src.casinos import Casino
+from src.infrastructure.config import get_environment
+from src.infrastructure.browser import Cookie
+from src.domain import Casino
 from src.casinos.one_win.games import Aviator
 from time import time
 

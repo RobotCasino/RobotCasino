@@ -1,4 +1,4 @@
-from src.casinos import Game
+from src.domain import Game
 from pydoll.browser.tab import Tab
 import asyncio
 

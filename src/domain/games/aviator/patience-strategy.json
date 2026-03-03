@@ -1,0 +1,5 @@
+{
+    "name": "Patience Strategy",
+    "description": "Wait for one purple to bet. If lost, wait for another purple to use martingale.",
+    "operation": ""
+}

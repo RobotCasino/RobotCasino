@@ -1,8 +1,8 @@
 from pydoll.elements.web_element import WebElement
-from src.casinos import Game, Strategier, Scripter
+from src.domain import Game, StrategyLoader, ScriptLoader
 from pydoll.browser.tab import Tab
 from pydoll.constants import By
-from src.jarvis import Jarvis
+from src.infrastructure.logging.logger import Logger
 import asyncio
 
 class Aviator(Game):
@@ -21,10 +21,11 @@ class Aviator(Game):
             await asyncio.sleep(3600)
 
     async def _load_strategy(self, iframe: WebElement):
-        utils_script = Scripter.get_game_utils_script()
-        general_script = Scripter.get_general_game_script(self.get_casino(), self.get_name())
-        domain_script = Scripter.get_game_domain_script(self.get_name())
-        strategy_script = Strategier.get_strategy_script_with_payload(
+        utils_script = ScriptLoader.get_game_utils_script()
+        general_script = ScriptLoader.get_general_game_script(self.get_casino(), self.get_name())
+        domain_script = ScriptLoader.get_game_domain_script(self.get_name())
+        observer_script = ScriptLoader.get_game_observer_script()
+        strategy_script = StrategyLoader.get_strategy_script_with_payload(
             self.get_name(),
             self.get_strategy(),
             self.get_user_data()
@@ -32,6 +33,7 @@ class Aviator(Game):
 
         await iframe.execute_script(utils_script)
         await iframe.execute_script(domain_script)
+        await iframe.execute_script(observer_script)
         await iframe.execute_script(strategy_script)
         await iframe.execute_script(general_script)
         
