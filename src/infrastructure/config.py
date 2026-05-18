@@ -4,15 +4,14 @@ import pathlib
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 PROJECT_DIR = BASE_DIR.parent
 
-IS_HEADLESS = os.environ.get("HEADLESS", "0") == "1"
-
 LOGS_DIR = PROJECT_DIR / "logs"
 
 IS_DOCKER = pathlib.Path("/app").exists() and pathlib.Path("/.dockerenv").exists()
 OUTPUT_DIR = pathlib.Path("/app/output") if IS_DOCKER else PROJECT_DIR / "output"
 
-SOCKET_PATH = pathlib.Path(pathlib.Path.home() / ".robotcasino.socket")
-PID_PATH =  pathlib.Path("/tmp/robotcasino.pid")
+SOCKET_PATH = str(pathlib.Path(pathlib.Path.home() / ".robotcasino.socket"))
+PID_PATH =  str(pathlib.Path("/tmp/robotcasino.pid"))
+
 CONSOLE_LOG_PATH = LOGS_DIR / "messages.log"
 ERROR_LOG_PATH = LOGS_DIR / "errors.log"
 

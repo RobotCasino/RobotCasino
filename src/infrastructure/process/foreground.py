@@ -1,7 +1,8 @@
-import os
 import signal
 import asyncio
+from pathlib import Path
 
+from os import getpid, remove
 from src.infrastructure.config import PID_PATH, SOCKET_PATH
 
 
@@ -17,8 +18,8 @@ class ForegroundProcess:
         self._loop = None
 
     def start(self):
-        PID_PATH.parent.mkdir(parents=True, exist_ok=True)
-        PID_PATH.write_text(str(os.getpid()))
+        Path(PID_PATH).parent.mkdir(parents=True, exist_ok=True)
+        Path(PID_PATH).write_text(str(getpid()))
 
         signal.signal(signal.SIGINT, self._handle_terminate)
         signal.signal(signal.SIGTERM, self._handle_terminate)
@@ -45,12 +46,12 @@ class ForegroundProcess:
         raise SystemExit(0)
 
     def _cleanup(self):
-        SOCKET_PATH.unlink(missing_ok=True)
-        PID_PATH.unlink(missing_ok=True)
+        remove(SOCKET_PATH)
+        remove(PID_PATH)
 
     @staticmethod
     def is_running() -> bool:
-        return PID_PATH.is_file()
+        return Path(PID_PATH).is_file()
 
 
 __ALL__ = ["ForegroundProcess"]

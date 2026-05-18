@@ -1,13 +1,13 @@
 
 import sys, typer, rich, os, signal
-import typing, datetime, multiprocessing
+import typing, datetime
 
 from src.casinos.registry import CasinoRegistry
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.process import SocketServer
 from src.application import ScraperService
 from src.infrastructure.ipc import Sender
-from src.infrastructure.process import DaemonProcess, ForegroundProcess
+from src.infrastructure.process import ForegroundProcess
 from src.infrastructure.config import get_environment, init as init_config
 from src.infrastructure.config import PID_PATH, SOCKET_PATH, OUTPUT_DIR
 

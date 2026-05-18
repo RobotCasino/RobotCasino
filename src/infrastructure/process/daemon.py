@@ -2,6 +2,8 @@ import os
 import signal
 import asyncio
 
+from pathlib import Path
+
 from src.infrastructure.config import PID_PATH, SOCKET_PATH
 
 class DaemonProcess:
@@ -29,8 +31,8 @@ class DaemonProcess:
         os.setpgid(0, 0)
         os.umask(0)
 
-        PID_PATH.parent.mkdir(parents=True, exist_ok=True)
-        PID_PATH.write_text(str(os.getpid()))
+        Path(PID_PATH).parent.mkdir(parents=True, exist_ok=True)
+        Path(PID_PATH).write_text(str(os.getpid()))
 
         self.pid = os.getpid()
 
@@ -41,7 +43,7 @@ class DaemonProcess:
     
     @staticmethod
     def is_running() -> bool:
-        return PID_PATH.is_file()
+        return Path(PID_PATH).is_file()
     
     @staticmethod
     def stop() -> None:
@@ -54,8 +56,8 @@ class DaemonProcess:
             else:
                 self.close_callback()
 
-        SOCKET_PATH.unlink(missing_ok=True)
-        PID_PATH.unlink(missing_ok=True)
+        os.remove(SOCKET_PATH)
+        os.remove(PID_PATH)
 
         if (self.pid is not None):
             os.killpg(int(self.pid), signal.SIGKILL)

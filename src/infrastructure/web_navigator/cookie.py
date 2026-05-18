@@ -1,24 +1,7 @@
-from typing import Optional, Dict, Any, Literal
+from typing import Optional, Literal
 
 
 class Cookie:
-    """Builder-style Cookie helper.
-
-    Usage:
-        cookie = (
-            Cookie()
-            .set_name("session")
-            .set_value("abc")
-            .set_domain("example.com")
-            .set_path("/")
-            .set_http_only(True)
-            .build()
-        )
-
-    The `build()` method returns a dict matching the cookie schema:
-    {name, value, url, domain, path, expires, httpOnly, secure, sameSite}
-    """
-
     def __init__(self) -> None:
         self._name: Optional[str] = None
         self._value: Optional[str] = None
@@ -72,18 +55,52 @@ class Cookie:
         self._sameSite = same_site
         return self
 
-    def build(self) -> Dict[str, Any]:
-        if self._name is None or self._value is None:
-            raise ValueError("Both 'name' and 'value' are required for a cookie")
+    def get_name(self) -> Optional[str]:
+        return self._name
 
-        return {
-            "name": self._name,
-            "value": self._value,
-            "url": self._url,
-            "domain": self._domain,
-            "path": self._path,
-            "expires": self._expires,
-            "httpOnly": self._httpOnly,
-            "secure": self._secure,
-            "sameSite": self._sameSite,
-        }
+    def get_value(self) -> Optional[str]:
+        return self._value
+
+    def get_url(self) -> str:
+        return self._url
+
+    def get_domain(self) -> str:
+        return self._domain
+
+    def get_path(self) -> Optional[str]:
+        return self._path
+
+    def get_expires(self) -> Optional[float]:
+        return self._expires
+
+    def get_http_only(self) -> Optional[bool]:
+        return self._httpOnly
+
+    def get_secure(self) -> Optional[bool]:
+        return self._secure
+
+    def get_same_site(self) -> Optional[Literal["Lax", "None", "Strict"]]:
+        return self._sameSite
+
+    def to_dict(self) -> dict[str, str | bool | float]:
+        data: dict[str, str | bool | float] = {}
+        if self._name is not None:
+            data["name"] = self._name
+        if self._value is not None:
+            data["value"] = self._value
+        if self._domain:
+            data["domain"] = self._domain
+        if self._path is not None:
+            data["path"] = self._path
+        if self._secure is not None:
+            data["secure"] = self._secure
+        if self._httpOnly is not None:
+            data["httpOnly"] = self._httpOnly
+        if self._expires is not None:
+            data["expires"] = self._expires
+        if self._url:
+            data["url"] = self._url
+        if self._sameSite is not None:
+            data["sameSite"] = self._sameSite
+
+        return data

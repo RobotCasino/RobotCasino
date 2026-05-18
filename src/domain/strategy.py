@@ -5,23 +5,22 @@ from src.infrastructure.config import BASE_DIR
 class StrategyLoader:
 
     @staticmethod
-    def _get_strategy_json_path(game: str, strategy: str) -> Path:
-
+    def __get_strategy_json_path(game: str, strategy: str) -> Path:
         return BASE_DIR / "domain" / "games" / game.lower() / f"{strategy.lower()}.json"
 
     @staticmethod
-    def _get_strategy_script_path(game: str, strategy: str) -> Path:
+    def __get_strategy_script_path(game: str, strategy: str) -> Path:
         return BASE_DIR / "domain" / "games" / game.lower() / f"{strategy.lower()}.js"
 
     @staticmethod
     def is_strategy(game: str, strategy: str):
-        path = StrategyLoader._get_strategy_json_path(game, strategy)
+        path = StrategyLoader.__get_strategy_json_path(game, strategy)
 
         return path.is_file()
     
     @staticmethod
-    def get_strategy_as_dict(game: str, strategy: str) -> dict:
-        path = StrategyLoader._get_strategy_json_path(game, strategy)
+    def get_strategy_as_dict(game: str, strategy: str) -> dict[str, str | dict[str, str]]:
+        path = StrategyLoader.__get_strategy_json_path(game, strategy)
 
         if not path.is_file():
             raise FileNotFoundError(f"Strategy file not found: {path}")
@@ -38,7 +37,7 @@ class StrategyLoader:
 
     @staticmethod
     def get_strategy_as_string(game: str, strategy: str) -> str:
-        path = StrategyLoader._get_strategy_json_path(game, strategy)
+        path = StrategyLoader.__get_strategy_json_path(game, strategy)
         
         if not path.is_file():
             raise FileNotFoundError(f"Strategy file not found: {path}")
@@ -50,7 +49,7 @@ class StrategyLoader:
 
     @staticmethod
     def get_strategy_script(game: str, strategy: str) -> str:
-        path = StrategyLoader._get_strategy_script_path(game, strategy)
+        path = StrategyLoader.__get_strategy_script_path(game, strategy)
 
         if not path.is_file():
             raise FileNotFoundError(f"Strategy script file not found: {path}")
@@ -58,21 +57,21 @@ class StrategyLoader:
         return path.read_text(encoding='utf-8')
 
     @staticmethod
-    def build_strategy_with_user(game: str, strategy: str, user_data: dict | None = None) -> dict:
+    def build_strategy_with_user(game: str, strategy: str, user_data: dict[str, str] | None = None) -> dict[str, str | dict[str, str]]:
         strategy_data = StrategyLoader.get_strategy_as_dict(game, strategy)
         safe_user_data = user_data or {}
 
         strategy_data['user'] = {
             'betAmount': safe_user_data.get('amount', '3.0'),
             'autoWithdrawal': safe_user_data.get('auto', '1.5'),
-            'martingaleAttempts': safe_user_data.get('martingaleAttempts', 2),
-            'martingaleMultiplier': safe_user_data.get('martingaleMultiplier', 2)
+            'martingaleAttempts': safe_user_data.get('martingaleAttempts', '2'),
+            'martingaleMultiplier': safe_user_data.get('martingaleMultiplier', '2')
         }
 
         return strategy_data
 
     @staticmethod
-    def get_strategy_script_with_payload(game: str, strategy: str, user_data: dict | None = None) -> str:
+    def get_strategy_script_with_payload(game: str, strategy: str, user_data: dict[str, str] | None = None) -> str:
         script = StrategyLoader.get_strategy_script(game, strategy)
         strategy_data = StrategyLoader.build_strategy_with_user(game, strategy, user_data)
 

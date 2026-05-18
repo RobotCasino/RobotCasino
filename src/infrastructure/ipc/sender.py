@@ -7,7 +7,7 @@ class Sender:
     def __init__(self, socketPath: str):
         self.__socketPath = socketPath
 
-    def send(self, message: dict) -> Optional[dict]:
+    def send(self, message: dict[str, str]) -> Optional[dict[str, str]]:
         with socket(AF_UNIX, SOCK_STREAM) as client:
             client.connect(self.__socketPath)
             client.sendall((json.dumps(message) + "\n").encode())

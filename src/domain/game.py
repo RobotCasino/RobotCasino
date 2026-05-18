@@ -5,17 +5,12 @@ from src.domain.strategy import StrategyLoader
 from pydoll.elements.web_element import WebElement
 
 class Game(ABC):
-
-    __casino: str
-    __name: str
-    __url: str
-    __strategy: str = 'default'
-    __user_data: dict = {}
-
-    def __init__(self, casino, url, name):
+    def __init__(self, casino: str, url: str, name: str):
         self.__casino = casino
         self.__url = url
         self.__name = name
+        self.__strategy = 'default'
+        self.__user_data: dict[str, str] = {}
 
     @abstractmethod
     async def play(self, tab: Tab):
@@ -40,7 +35,7 @@ class Game(ABC):
     def get_user_data(self):
         return self.__user_data
     
-    def set_user_data(self, data: dict):
+    def set_user_data(self, data: dict[str, str]):
         self.__user_data = data
     
     def set_strategy(self, strategy: str):

@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app/output
 
 ENV PYTHONUNBUFFERED=1
-ENV HEADLESS=1
+ENV HEADLESS=0
+ENV CHROME_BINARY_PATH=/usr/bin/google-chrome-stable
 
 COPY . .
 

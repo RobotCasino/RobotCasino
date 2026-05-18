@@ -2,7 +2,6 @@ from pydoll.elements.web_element import WebElement
 from src.domain import Game, StrategyLoader, ScriptLoader
 from pydoll.browser.tab import Tab
 from pydoll.constants import By
-from src.infrastructure.logging.logger import Logger
 import asyncio
 
 class Aviator(Game):
