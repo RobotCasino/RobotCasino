@@ -1,15 +1,17 @@
 from typing import Callable
-from src.domain.game import Game
-from src.infrastructure.browser import Cookie
+from domain.games.game import Game
+from src.navigators import Cookie
+from abc import ABC, abstractmethod
 
-class Casino():
+class Casino(ABC):
     def __init__(self, name: str, url: str, games: dict[str, Callable[[], Game]]) -> None:
         self.__name = name
         self.__url = url
         self.__games = games
 
+    @abstractmethod
     def get_cookies(self) -> list[Cookie]:
-        return []
+        pass
 
     def get_name(self):
         return self.__name

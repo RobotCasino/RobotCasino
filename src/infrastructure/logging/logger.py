@@ -24,7 +24,6 @@ _logger.setLevel(logging.DEBUG)
 _logger.addHandler(_console_handler)
 _logger.addHandler(_stderr_handler)
 
-
 class Logger:
     @staticmethod
     def _rotate_log_if_needed(path):

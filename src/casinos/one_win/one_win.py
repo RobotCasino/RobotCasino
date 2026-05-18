@@ -1,10 +1,10 @@
-from domain.game import Game
-from src.infrastructure.config import get_environment
-from src.infrastructure.browser import Cookie
-from src.domain import Casino
-from src.casinos.one_win.games import Aviator
+from domain.games.game import Game
+from src.navigators import Cookie
+from src.casinos import Casino
 from time import time
 from typing import Callable
+
+from os import getenv
 
 class OneWin(Casino):
 
@@ -23,7 +23,7 @@ class OneWin(Casino):
     def get_cookies(self) -> list[Cookie]:
         token = Cookie() \
             .set_name("1w_token") \
-            .set_value(get_environment("SESSION_TOKEN")) \
+            .set_value(str(getenv("SESSION_TOKEN"))) \
             .set_domain(f"{self.__domain}") \
             .set_path("/") \
             .set_expires(time() + 365 * 24 * 3600) \

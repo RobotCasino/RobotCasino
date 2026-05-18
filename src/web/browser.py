@@ -1,7 +1,7 @@
 
-from src.application.tab import Tab
+from src.web.tab import Tab
 
-from src.infrastructure.web_navigator import Navigator
+from src.navigators import Navigator
 
 class Browser:
     def __init__(self, navigator: Navigator) -> None:
@@ -11,5 +11,8 @@ class Browser:
         tab = await self.__navigator.open_tab()
 
         return Tab(tab)
+    
+    async def close(self):
+        await self.__navigator.close()
 
 __ALL__ = ['Browser']

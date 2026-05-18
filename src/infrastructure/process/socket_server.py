@@ -2,19 +2,21 @@ from asyncio import StreamReader, StreamWriter, gather, start_unix_server
 from typing import Awaitable, Callable
 
 from src.infrastructure.config import SOCKET_PATH
-from os import remove
+from pathlib import Path
 
 class SocketServer:
 
     def __init__(self, listener: Callable[[StreamReader, StreamWriter], Awaitable[None] | None], program: Callable[[], Awaitable[None]]):
         self.listener = listener
         self.program = program
+
+        self.socketPath = Path(SOCKET_PATH)
     
     async def start_unix_server(self):
         return await start_unix_server(self.listener, SOCKET_PATH)
     
     async def loop(self):
-        remove(SOCKET_PATH)
+        self.socketPath.unlink(missing_ok=True)
         
         server = await start_unix_server(self.listener, str(SOCKET_PATH))
 
@@ -25,4 +27,4 @@ class SocketServer:
             
             await server.wait_closed()
             
-            remove(SOCKET_PATH)
+            self.socketPath.unlink(missing_ok=True)

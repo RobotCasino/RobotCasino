@@ -1,5 +1,2 @@
-from src.domain.game import Game
-from src.domain.casino import Casino
-from src.domain.strategy import StrategyLoader
-from src.domain.script_loader import ScriptLoader
-from src.casinos.registry import CasinoRegistry
+from src.casinos.one_win.one_win import OneWinCasino
+from src.casinos.casinos import Casinos

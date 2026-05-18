@@ -7,4 +7,8 @@ class Navigator(ABC):
     async def open_tab(self) -> PydollTab:
         pass
 
+    @abstractmethod
+    async def close(self) -> None:
+        pass
+
 __ALL__ = ['Navigator']

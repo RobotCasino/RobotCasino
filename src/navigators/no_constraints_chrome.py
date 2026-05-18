@@ -3,7 +3,7 @@ from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
 from pydoll.browser.chromium import Chrome
 
-from src.infrastructure.web_navigator.navigator import Navigator
+from src.navigators.navigator import Navigator
 
 class NoConstraintsChrome(Navigator):
     def __init__(self):
@@ -41,5 +41,11 @@ class NoConstraintsChrome(Navigator):
         self.__tabs.append(tab)
 
         return tab
+    
+    async def close(self) -> None:
+        if self.__navigator is None:
+            return
+        
+        await self.__navigator.close()
  
 __ALL__ = ['NoConstraintsChrome']

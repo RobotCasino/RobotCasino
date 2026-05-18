@@ -17,9 +17,12 @@ class ForegroundProcess:
         self.close_callback = close_callback
         self._loop = None
 
+        self.pidpath = Path(PID_PATH)
+        self.socketpath = Path(SOCKET_PATH)
+
     def start(self):
-        Path(PID_PATH).parent.mkdir(parents=True, exist_ok=True)
-        Path(PID_PATH).write_text(str(getpid()))
+        self.pidpath.parent.mkdir(parents=True, exist_ok=True)
+        self.pidpath.write_text(str(getpid()))
 
         signal.signal(signal.SIGINT, self._handle_terminate)
         signal.signal(signal.SIGTERM, self._handle_terminate)
@@ -46,8 +49,8 @@ class ForegroundProcess:
         raise SystemExit(0)
 
     def _cleanup(self):
-        remove(SOCKET_PATH)
-        remove(PID_PATH)
+        self.socketpath.unlink(missing_ok=True)
+        self.pidpath.unlink(missing_ok=True)
 
     @staticmethod
     def is_running() -> bool:

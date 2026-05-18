@@ -1,0 +1,2 @@
+from src.strategies.aviator.simple_strategy import AviatorSimpleStrategy
+from src.strategies.strategies import Strategies

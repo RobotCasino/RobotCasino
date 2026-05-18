@@ -13,6 +13,9 @@ class DaemonProcess:
         self.close_callback = close_callback
         self.pid = None
 
+        self.pidPath = Path(PID_PATH)
+        self.socketPath = Path(SOCKET_PATH)
+
     def start(self):
         try:
             pid = os.fork()
@@ -31,8 +34,8 @@ class DaemonProcess:
         os.setpgid(0, 0)
         os.umask(0)
 
-        Path(PID_PATH).parent.mkdir(parents=True, exist_ok=True)
-        Path(PID_PATH).write_text(str(os.getpid()))
+        self.pidPath.parent.mkdir(parents=True, exist_ok=True)
+        self.pidPath.write_text(str(os.getpid()))
 
         self.pid = os.getpid()
 
@@ -56,8 +59,8 @@ class DaemonProcess:
             else:
                 self.close_callback()
 
-        os.remove(SOCKET_PATH)
-        os.remove(PID_PATH)
+        self.socketPath.unlink(missing_ok=True)
+        self.pidPath.unlink(missing_ok=True)
 
         if (self.pid is not None):
             os.killpg(int(self.pid), signal.SIGKILL)

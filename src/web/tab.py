@@ -2,7 +2,8 @@ from pydoll.browser.tab import Tab as PydollTab
 from pydoll.protocol.runtime.events import RuntimeEvent
 from collections.abc import Callable
 
-from src.infrastructure.web_navigator import Cookie
+from src.domain import Game
+from src.navigators import Cookie
 
 class Tab:
     def __init__(self, tab: PydollTab) -> None:
@@ -45,5 +46,11 @@ class Tab:
         await self.__page.enable_runtime_events()
 
         await self.__page.on(RuntimeEvent.CONSOLE_API_CALLED, callback) # pyright: ignore
+
+    async def find_element(self, element: str) -> None:
+        pass
+
+    async def play(self, game: Game) -> None:
+        await game.play(self)
 
 __ALL__ = ['Tab']
