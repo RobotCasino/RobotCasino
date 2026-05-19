@@ -12,8 +12,8 @@ OUTPUT_DIR = pathlib.Path("/app/output") if IS_DOCKER else PROJECT_DIR / "output
 SOCKET_PATH = str(pathlib.Path(pathlib.Path.home() / ".robotcasino.socket"))
 PID_PATH =  str(pathlib.Path("/tmp/robotcasino.pid"))
 
-CONSOLE_LOG_PATH = LOGS_DIR / "messages.log"
-ERROR_LOG_PATH = LOGS_DIR / "errors.log"
+CONSOLE_LOG_PATH = OUTPUT_DIR / "messages.log"
+ERROR_LOG_PATH = OUTPUT_DIR / "errors.log"
 
 
 def init():

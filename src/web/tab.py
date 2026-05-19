@@ -2,8 +2,10 @@ from pydoll.browser.tab import Tab as PydollTab
 from pydoll.protocol.runtime.events import RuntimeEvent
 from collections.abc import Callable
 
-from src.domain import Game
 from src.navigators import Cookie
+from src.domain import Script
+
+from src.web.element import Element
 
 class Tab:
     def __init__(self, tab: PydollTab) -> None:
@@ -47,10 +49,10 @@ class Tab:
 
         await self.__page.on(RuntimeEvent.CONSOLE_API_CALLED, callback) # pyright: ignore
 
-    async def find_element(self, element: str) -> None:
+    async def find_element(self, element: str) -> Element | None:
         pass
 
-    async def play(self, game: Game) -> None:
-        await game.play(self)
+    async def execute_script(self, script: Script) -> None:
+        await self.__page.execute_script(script)
 
 __ALL__ = ['Tab']

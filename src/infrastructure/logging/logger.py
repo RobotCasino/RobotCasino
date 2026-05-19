@@ -29,7 +29,10 @@ class Logger:
     def _rotate_log_if_needed(path):
         """Truncate log file to half size when it exceeds MAX_LOG_SIZE."""
         try:
-            if os.path.getsize(path) > MAX_LOG_SIZE:
+            # Ensure the directory exists before attempting to operate on the file
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            
+            if os.path.exists(path) and os.path.getsize(path) > MAX_LOG_SIZE:
                 with open(path, 'rb') as f:
                     f.seek(-MAX_LOG_SIZE // 2, 2)
                     content = f.read()

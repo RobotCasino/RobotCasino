@@ -1,8 +1,6 @@
-from domain.games.game import Game
 from src.navigators import Cookie
-from src.casinos import Casino
+from src.domain import Casino
 from time import time
-from typing import Callable
 
 from os import getenv
 
@@ -13,12 +11,8 @@ class OneWin(Casino):
         self.__display_name = '1Win'
         self.__domain = '1win.com'
         self.__url = 'https://1win.com/'
-        
-        self.__games: dict[str, Callable[[], Game]] = {
-            'aviator': lambda: Aviator(self.__name, 'https://1win.com/casino/play/v_spribe:aviator'),
-        }
 
-        super().__init__(self.__name, self.__url, self.__games)
+        super().__init__(self.__name, self.__url)
 
     def get_cookies(self) -> list[Cookie]:
         token = Cookie() \

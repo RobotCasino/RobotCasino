@@ -59,13 +59,15 @@ class Scraper:
         game = Games.get_game_or_fail(self.__casino, self.__game)
         strategy = Strategies.get_strategy_or_fail(self.__game, self.__strategy)
 
+        game.load_strategy(strategy)
+
         browser = Browser(navigator)
 
         tab = await browser.open_tab()
 
         await tab.console(self.__watcher) # pyright: ignore
 
-        await tab.play(game, strategy)
+        await game.play(tab)
 
     async def close(self):
         if self.__active_tab:
@@ -74,13 +76,6 @@ class Scraper:
             except Exception:
                 pass
             self.__active_tab = None
-
-        if self.__chrome:
-            try:
-                await self..__aexit__(None, None, None) # pyright: ignore
-            except Exception:
-                pass
-            self.__chrome = None
 
     async def screenshot(self, path: str) -> str:
         if self.__active_tab is None:

@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
-from src.web import Tab
+from typing import TYPE_CHECKING
 
-from src.domain.games.vo import Strategy
+if TYPE_CHECKING:
+    from src.web.tab import Tab
+
+from src.domain.strategies.strategy import Strategy
 
 class Game(ABC):
     def __init__(self, casino: str, url: str, name: str):
@@ -11,7 +14,7 @@ class Game(ABC):
         self.__strategy: Strategy | None = None
 
     @abstractmethod
-    async def play(self, tab: Tab):
+    async def play(self, tab: 'Tab'):
         pass
 
     def get_name(self):
@@ -28,3 +31,6 @@ class Game(ABC):
     
     def load_strategy(self, strategy: Strategy):
         self.__strategy = strategy
+    
+    def is_strategy_loaded(self) -> bool:
+        return self.__strategy is not None

@@ -1,18 +1,18 @@
-from pydoll.elements.web_element import WebElement
 from src.domain import Game
-from src.web import Tab
-import asyncio
+from src.web import Tab, Element
 
 class Aviator(Game):
 
     def __init__(self):
-        super().__init__("OneWin", "https://onewin-aviator.com", 'aviator')
+        super().__init__("OneWin", "https://1win.com", 'aviator')
 
     async def play(self, tab: Tab):
-        while True:
-            await asyncio.sleep(3600)
+        if not self.is_strategy_loaded():
+            raise ValueError('Strategy not loaded')
 
-    async def _load_strategy(self, iframe: WebElement):
+        await tab.go_to(self.get_url())
+
+    async def _load_strategy(self, iframe: Element):
         pass
         # utils_script = ScriptLoader.get_game_utils_script()
         # general_script = ScriptLoader.get_general_game_script(self.get_casino(), self.get_name())
@@ -38,7 +38,7 @@ class Aviator(Game):
         if isinstance(play_btn, WebElement):
             await play_btn.click()
 
-    async def __get_iframe(self, tab: Tab) -> WebElement | bool: # pyright: ignore
+    async def __get_iframe(self, tab: Tab) -> Element | bool: # pyright: ignore
         iframe_element = await tab.find_element('iframe')
 
         return False

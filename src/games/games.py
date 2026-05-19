@@ -1,7 +1,7 @@
 from enum import Enum
 
 from src.domain import Game
-from src.games import OneWinAviator
+from src.games.one_win.aviator import Aviator as OneWinAviator
 
 class Games(Enum):
     ONE_WIN_AVIATOR = OneWinAviator()
