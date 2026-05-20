@@ -2,21 +2,24 @@ from datetime import datetime
 
 import rich
 
-from typer import Typer
+from typer import Typer, Context
 from src.application.scraper import Scraper
 from src.infrastructure.config import OUTPUT_DIR, SOCKET_PATH
 from src.infrastructure.ipc.sender import Sender
 from src.infrastructure.process.socket_server import SocketServer
 from src.infrastructure.process.foreground import ForegroundProcess
+from src.utils.args_parser import ArgsParser
 
 App = Typer(add_completion=False)
 
 @App.command(
-    context_settings={"allow_extra_args": False, "ignore_unknown_options": True},
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     short_help="Run the Scraper in foreground mode (Docker-compatible)."
 )
-def run(browser: str, casino: str, game: str, strategy: str, session: str):
-    scraper = Scraper(browser, casino, game, strategy, session)
+def run(ctx: Context, browser: str, casino: str, game: str, strategy: str):
+    extra_params = ArgsParser.parse_args(ctx.args)
+
+    scraper = Scraper(browser, casino, game, strategy, extra_params)
 
     socketServer = SocketServer(scraper.controller, scraper.run)
 

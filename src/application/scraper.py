@@ -17,14 +17,14 @@ from src.casinos.casinos import Casinos
 from src.strategies.strategies import Strategies
 
 class Scraper:
-    def __init__(self, browser: str, casino: str , game: str, strategy: str, session: str) -> None:
-        Logger.info(f"Starting scraper with browser={browser}, casino={casino}, game={game}, strategy={strategy}, session={session}")
+    def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] | None = None) -> None:
+        Logger.info(f"Starting scraper with browser={browser}, casino={casino}, game={game}, strategy={strategy}")
 
         self.__browser = browser
         self.__casino = casino
         self.__game = game
         self.__strategy = strategy
-        self.__session = session
+        self.__extra_params = extra_params
 
         self.__active_tab: Tab | None = None
 
@@ -67,9 +67,9 @@ class Scraper:
         browser = Browser(navigator)
 
         tab = await browser.open_tab()
-
         await tab.console(self.__watcher) # pyright: ignore
 
+        await casino.prepare(tab)
         await game.play(tab)
 
     async def close(self):

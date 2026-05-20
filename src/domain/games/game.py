@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from src.domain.strategies.strategy import Strategy
 from src.domain.casinos.casino import Casino
@@ -12,9 +12,16 @@ class Game(ABC):
     def __init__(self, name: str, url: str):
         self.__name = name
         self.__url = url
+        self.__metadata: dict[str, Any] = {}
 
         self.__strategy: Strategy | None = None
         self.__casino: Casino | None = None
+
+    def set_metadata(self, key: str, value: Any) -> None:
+        self.__metadata[key] = value
+
+    def get_metadata(self, key: str) -> Any:
+        return self.__metadata.get(key)
 
     @abstractmethod
     async def play(self, tab: 'Tab'):

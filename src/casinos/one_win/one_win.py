@@ -18,7 +18,7 @@ class OneWin(Casino):
     async def prepare(self, tab: Tab):
         authCookie = Cookie() \
             .set_name("1w_token") \
-            .set_value(str(getenv("SESSION_TOKEN"))) \
+            .set_value(getenv("SESSION_TOKEN", "")) \
             .set_domain(f"{self.get_domain()}") \
             .set_path("/") \
             .set_expires(time() + 365 * 24 * 3600) \
