@@ -5,8 +5,9 @@ import rich
 from typer import Typer
 from src.application.scraper import Scraper
 from src.infrastructure.config import OUTPUT_DIR, SOCKET_PATH
-from src.infrastructure.ipc import Sender
-from src.infrastructure.process import SocketServer, ForegroundProcess
+from src.infrastructure.ipc.sender import Sender
+from src.infrastructure.process.socket_server import SocketServer
+from src.infrastructure.process.foreground import ForegroundProcess
 
 App = Typer(add_completion=False)
 

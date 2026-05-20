@@ -11,10 +11,10 @@ from src.infrastructure.config import PID_PATH, SOCKET_PATH
 from src.web.tab import Tab
 from src.web.browser import Browser
 
-from src.navigators import Navigators
-from src.games import Games
-from src.casinos import Casinos
-from src.strategies import Strategies
+from src.navigators.navigators import Navigators
+from src.games.games import Games
+from src.casinos.casinos import Casinos
+from src.strategies.strategies import Strategies
 
 class Scraper:
     def __init__(self, browser: str, casino: str , game: str, strategy: str, session: str) -> None:
@@ -59,7 +59,10 @@ class Scraper:
         game = Games.get_game_or_fail(self.__casino, self.__game)
         strategy = Strategies.get_strategy_or_fail(self.__game, self.__strategy)
 
-        game.load_strategy(strategy)
+        game.set_strategy(strategy)
+        game.set_casino(casino)
+
+        game.is_ready_or_fail()
 
         browser = Browser(navigator)
 

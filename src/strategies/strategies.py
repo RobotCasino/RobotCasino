@@ -1,4 +1,4 @@
-from src.strategies.aviator.simple_strategy import AviatorSimpleStrategy
+from src.strategies.aviator.simple_strategy import SimpleStrategy as AviatorSimpleStrategy
 
 from enum import Enum
 

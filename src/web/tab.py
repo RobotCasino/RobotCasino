@@ -1,11 +1,14 @@
 from pydoll.browser.tab import Tab as PydollTab
 from pydoll.protocol.runtime.events import RuntimeEvent
+from asyncio import sleep
+
 from collections.abc import Callable
 
-from src.navigators import Cookie
-from src.domain import Script
+from src.navigators.cookie import Cookie
 
 from src.web.element import Element
+
+from src.domain.scripts.script import Script
 
 class Tab:
     def __init__(self, tab: PydollTab) -> None:
@@ -53,6 +56,12 @@ class Tab:
         pass
 
     async def execute_script(self, script: Script) -> None:
-        await self.__page.execute_script(script)
+        await self.__page.execute_script(str(script))
+
+    async def sleep(self, seconds: int) -> None:
+        return await sleep(seconds)
+    
+    async def reload(self) -> None:
+        await self.__page.refresh()
 
 __ALL__ = ['Tab']

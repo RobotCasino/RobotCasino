@@ -1,7 +1,7 @@
 from enum import Enum
 
-from src.casinos.one_win import OneWin
-from src.domain import Casino
+from src.casinos.one_win.one_win import OneWin
+from src.domain.casinos.casino import Casino
 
 class Casinos(Enum):
     ONE_WIN = OneWin()

@@ -1,7 +1,7 @@
 
 from src.web.tab import Tab
 
-from src.navigators import Navigator
+from src.navigators.navigator import Navigator
 
 class Browser:
     def __init__(self, navigator: Navigator) -> None:

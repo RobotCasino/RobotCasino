@@ -1,6 +1,6 @@
 from enum import Enum
 
-from src.domain import Game
+from src.domain.games.game import Game
 from src.games.one_win.aviator import Aviator as OneWinAviator
 
 class Games(Enum):

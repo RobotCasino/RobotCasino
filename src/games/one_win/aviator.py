@@ -1,14 +1,18 @@
-from src.domain import Game
-from src.web import Tab, Element
+from src.domain.games.game import Game
+from src.web.tab import Tab
+from src.web.element import Element
 
 class Aviator(Game):
 
     def __init__(self):
-        super().__init__("OneWin", "https://1win.com", 'aviator')
+        super().__init__("Onewin Aviator", "https://1win.com/casino/play/v_spribe:aviator")
 
     async def play(self, tab: Tab):
-        if not self.is_strategy_loaded():
-            raise ValueError('Strategy not loaded')
+        _casino = self.get_casino_or_fail()
+        _strategy = self.get_strategy_or_fail()
+
+        #await casino.load_scripts_to_tab_when_playing(tab)
+        #await strategy.load_scripts_to_tab_when_playing(tab)    
 
         await tab.go_to(self.get_url())
 

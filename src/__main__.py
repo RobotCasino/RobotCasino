@@ -1,4 +1,4 @@
-from src.application import App
+from src.application.app import App
 from src.infrastructure.config import init as config_init
 
 
