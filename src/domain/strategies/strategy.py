@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from src.domain.scripts.script import Script
 
 if TYPE_CHECKING:
@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 
 class Strategy(ABC):
 
-    def __init__(self, scripts: tuple[Script]):
-        self._scripts = scripts
+    def __init__(self, playing_scripts: tuple[Script] | tuple[()] = tuple()):
+        self._playing_scripts = playing_scripts
 
     async def load_scripts_to_tab_when_playing(self, tab: "Tab") -> None:
-        for script in self._scripts:
+        for script in self._playing_scripts:
            await tab.execute_script(script)

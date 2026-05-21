@@ -8,13 +8,14 @@ class Aviator(Game):
         super().__init__("Onewin Aviator", "https://1win.com/casino/play/v_spribe:aviator")
 
     async def play(self, tab: Tab):
-        _casino = self.get_casino_or_fail()
-        _strategy = self.get_strategy_or_fail()
-
-        #await casino.load_scripts_to_tab_when_playing(tab)
-        #await strategy.load_scripts_to_tab_when_playing(tab)    
+        casino = self.get_casino_or_fail()
+        strategy = self.get_strategy_or_fail()
 
         await tab.go_to(self.get_url())
+
+        await casino.load_scripts_to_tab_when_playing(tab)
+        await strategy.load_scripts_to_tab_when_playing(tab)
+
 
     async def _load_strategy(self, iframe: Element):
         pass

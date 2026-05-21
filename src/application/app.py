@@ -43,3 +43,14 @@ def screenshot(path: str | None = None):
 
     if res is not None:
         rich.print(res.get("result"))
+
+@App.command(
+    context_settings={"allow_extra_args": False, "ignore_unknown_options": True},
+    short_help="Stop the scraper and exit."
+)
+def stop():
+    sender = Sender(SOCKET_PATH)
+
+    sender.send({
+        "cmd": "stop",
+    })

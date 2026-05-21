@@ -1,9 +1,9 @@
+from src.domain.scripts.script import Script
 from src.navigators.cookie import Cookie
 from src.domain.casinos.casino import Casino
 from src.web.tab import Tab
+from src.utils.metadata import Metadata
 from time import time
-
-from os import getenv
 
 class OneWin(Casino):
 
@@ -13,12 +13,14 @@ class OneWin(Casino):
         domain = '1win.com'
         url = 'https://1win.com/'
 
-        super().__init__(name, url, display_name, domain)
+        playing_scripts: tuple[Script] | tuple[()] = tuple()
+
+        super().__init__(name, url, display_name, domain, playing_scripts)
 
     async def prepare(self, tab: Tab):
         authCookie = Cookie() \
             .set_name("1w_token") \
-            .set_value(getenv("SESSION_TOKEN", "")) \
+            .set_value(Metadata.get_or_fail('SESSION_TOKEN')) \
             .set_domain(f"{self.get_domain()}") \
             .set_path("/") \
             .set_expires(time() + 365 * 24 * 3600) \

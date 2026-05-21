@@ -35,9 +35,9 @@ ENV PYTHONUNBUFFERED=1
 ENV HEADLESS=0
 ENV CHROME_BINARY_PATH=/usr/bin/google-chrome-stable
 
-COPY . .
+COPY . /app/
 
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir /app/
 
 VOLUME /app/output
 

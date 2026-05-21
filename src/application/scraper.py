@@ -1,12 +1,11 @@
 import re
 import json
 
-from pathlib import Path
 from asyncio import StreamReader, StreamWriter
 
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.ipc.receiver import Receiver
-from src.infrastructure.config import PID_PATH, SOCKET_PATH
+from src.infrastructure.process.foreground import ForegroundProcess
 
 from src.web.tab import Tab
 from src.web.browser import Browser
@@ -16,17 +15,20 @@ from src.games.games import Games
 from src.casinos.casinos import Casinos
 from src.strategies.strategies import Strategies
 
+from src.utils.metadata import Metadata
+
 class Scraper:
-    def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] | None = None) -> None:
+    def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] = {}) -> None:
         Logger.info(f"Starting scraper with browser={browser}, casino={casino}, game={game}, strategy={strategy}")
 
         self.__browser = browser
         self.__casino = casino
         self.__game = game
         self.__strategy = strategy
-        self.__extra_params = extra_params
 
         self.__active_tab: Tab | None = None
+
+        Metadata.set_dictionary(extra_params)
 
     async def controller(self, reader: StreamReader, writer: StreamWriter):
         try:
@@ -44,6 +46,9 @@ class Scraper:
                   res = await self.screenshot(arg)
                 case "html":
                   res = await self.html()
+                case "stop":
+                  res = "Stopping scraper..."
+                  ForegroundProcess.kill(self.close) # pyright: ignore
                 case _:
                   res = f"Unknown command: {command}"
             
@@ -78,8 +83,6 @@ class Scraper:
                 await self.__active_tab.close()
             except Exception:
                 pass
-            self.__active_tab = None
-
     async def screenshot(self, path: str) -> str:
         if self.__active_tab is None:
             return ":warning: Tab is not initialized."
@@ -129,10 +132,9 @@ class Scraper:
 
         match command:
             case "stop":
-                await self.close()
-                Path(SOCKET_PATH).unlink(missing_ok=True)
-                Path(PID_PATH).unlink(missing_ok=True)
                 Logger.info("Bye, bye!")
+                
+                ForegroundProcess.kill(self.close)
                 
                 if hasattr(self, "isBetting"):
                     self.isBetting = False # type: ignore
@@ -148,4 +150,4 @@ class Scraper:
                 if hasattr(self, "isBetting"):
                     self.isBetting = False # type: ignore
 
-__ALL__ = ["ScraperService"]
+__ALL__ = ["Scraper"]
