@@ -11,13 +11,6 @@ class Casino(ABC):
         self.__url = url
         self.__display_name = display_name
         self.__domain = domain
-        self.__metadata: dict[str, Any] = {}
-
-    def set_metadata(self, key: str, value: Any) -> None:
-        self.__metadata[key] = value
-
-    def get_metadata(self, key: str) -> Any:
-        return self.__metadata.get(key)
 
     @abstractmethod
     async def prepare(self, tab: "Tab") -> None:
