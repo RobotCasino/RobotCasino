@@ -1,5 +1,0 @@
-{
-    "name": "Simple Strategy",
-    "description": "A simple betting strategy for Aviator game.",
-    "operation": "[blue_count] >= 5"
-}

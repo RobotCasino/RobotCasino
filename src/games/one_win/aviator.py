@@ -5,7 +5,7 @@ from src.web.element import Element
 class Aviator(Game):
 
     def __init__(self):
-        super().__init__("Onewin Aviator", "https://1win.com/casino/play/v_spribe:aviator")
+        super().__init__("Aviator", "https://1win.com/casino/play/v_spribe:aviator")
 
     async def play(self, tab: Tab):
         game = self

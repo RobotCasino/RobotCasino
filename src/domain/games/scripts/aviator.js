@@ -1,4 +1,4 @@
-class DinoDomain {
+class Aviator {
     static isBlue(multiplier) {
         return multiplier >= 1 && multiplier < 2
     }
@@ -16,4 +16,4 @@ class DinoDomain {
     }
 }
 
-window.DinoDomain = DinoDomain;
+window.Aviator = Aviator;

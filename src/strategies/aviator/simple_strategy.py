@@ -6,7 +6,7 @@ class SimpleStrategy(Strategy):
 
     def __init__(self):
         playing_scripts: tuple[Script, ...] = (
-            Script('Simple Strategy',  f'{BASE_DIR}/games/shared/aviator-simple-strategy.js'),
+            Script('Simple Strategy',  f'{BASE_DIR}/strategies/scripts/aviator-simple-strategy.js'),
         )
 
         super().__init__(playing_scripts)

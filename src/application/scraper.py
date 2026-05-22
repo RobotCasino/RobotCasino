@@ -16,6 +16,7 @@ from src.casinos.casinos import Casinos
 from src.strategies.strategies import Strategies
 
 from src.utils.metadata import Metadata
+from src.utils.browser_console import BrowserConsole
 
 class Scraper:
     def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] = {}) -> None:
@@ -111,49 +112,22 @@ class Scraper:
     
 
     async def __watcher(self, message: object) -> None:
-        Logger.debug(f"{message}")
-
-        params = message.get("params")
-        if not isinstance(params, dict):
-            return
-        
-        args = params.get("args")
-        if not isinstance(args, list) or not args:
-            return
-
-        first_arg = args[0]
-        if not isinstance(first_arg, dict):
-            return
-
-        msg = first_arg.get("value")
-        if not isinstance(msg, str):
+        parsed = BrowserConsole.parse_message(message)
+        if not parsed:
             return
             
-        match = re.search(r'\[([^\]]+)\]', msg)
-        if not match:
-            return
-
-        command = match.group(1)
-        payload = msg[len(match.group(0)):].strip()
+        command, payload = parsed
 
         match command:
-            case "stop":
+            case "EXIT":
                 Logger.info("Bye, bye!")
                 
                 ForegroundProcess.kill(self.close)
-                
-                if hasattr(self, "isBetting"):
-                    self.isBetting = False # type: ignore
-            case "log":
+            case "LOG":
                 Logger.info(payload)
-                if hasattr(self, "isBetting"):
-                    self.isBetting = False # type: ignore
-            case "bet":
-                Logger.info(f"Betting {payload}")
-                if hasattr(self, "isBetting"):
-                    self.isBetting = True # type: ignore
-            case "waiting":
-                if hasattr(self, "isBetting"):
-                    self.isBetting = False # type: ignore
+            case "BET":
+                Logger.info(payload)
+            case "WAITING":
+                Logger.info(payload)
 
 __ALL__ = ["Scraper"]

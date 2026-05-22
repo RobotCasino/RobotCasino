@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from src.domain.strategies.strategy import Strategy
 from src.domain.casinos.casino import Casino
 
+from src.infrastructure.config import BASE_DIR
+from src.domain.scripts.script import Script
+
 if TYPE_CHECKING:
     from src.web.tab import Tab
-    from src.domain.scripts.script import Script
 
 class Game(ABC):
-    def __init__(self, name: str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple()):
+    def __init__(self, name: str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple(), domain_scripts: tuple['Script', ...] | tuple[()] = tuple()):
         self.__name = name
         self.__url = url
 
@@ -18,6 +20,11 @@ class Game(ABC):
         self.__casino: Casino | None = None
 
         self._playing_scripts: tuple['Script', ...] | tuple[()] = playing_scripts
+        self._domain_scripts: tuple['Script', ...] | tuple[()] = domain_scripts
+
+        self.__util_scripts: tuple['Script'] = (
+            Script('Util Script', f'{BASE_DIR}/domain/games/scripts/scraper.js'),
+        )
 
     @abstractmethod
     async def play(self, tab: 'Tab'):
@@ -56,5 +63,11 @@ class Game(ABC):
             raise ValueError("Game is not ready. Missing strategy or casino.")
         
     async def load_scripts_to_tab_when_playing(self, tab: 'Tab'):
+        for script in self.__util_scripts:
+            await tab.execute_script(script)
+
         for script in self._playing_scripts:
+            await tab.execute_script(script)
+            
+        for script in self._domain_scripts:
             await tab.execute_script(script)
