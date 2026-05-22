@@ -78,7 +78,9 @@ class Scraper:
         
         await tab.console(scraper.__watcher) # pyright: ignore
 
-        await casino.prepare(tab)
+        await casino.prepare_before_playing(tab)
+        await strategy.prepare_before_playing(tab)
+        
         await game.play(tab)
 
     async def close(self):

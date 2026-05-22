@@ -13,3 +13,6 @@ class Strategy(ABC):
     async def load_scripts_to_tab_when_playing(self, tab: "Tab") -> None:
         for script in self._playing_scripts:
            await tab.execute_script(script)
+
+    async def prepare_before_playing(self, tab: "Tab") -> None:
+        pass

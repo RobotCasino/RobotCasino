@@ -17,5 +17,9 @@ class Aviator(Game):
 
     async def play(self, tab: Tab):
         game = self
+        casino = self.get_casino_or_fail()
+        strategy = self.get_strategy_or_fail()
 
+        await casino.load_scripts_to_tab_when_playing(tab)
         await game.load_scripts_to_tab_when_playing(tab)
+        await strategy.load_scripts_to_tab_when_playing(tab)

@@ -17,7 +17,7 @@ class OneWin(Casino):
 
         super().__init__(name, url, display_name, domain, playing_scripts)
 
-    async def prepare(self, tab: Tab):
+    async def prepare_before_playing(self, tab: Tab):
         authCookie = Cookie() \
             .set_name("1w_token") \
             .set_value(Metadata.get_or_fail('SESSION_TOKEN')) \
