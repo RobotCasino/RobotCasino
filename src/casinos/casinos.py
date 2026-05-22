@@ -1,10 +1,12 @@
 from enum import Enum
 
+from src.casinos.test.test import Test
 from src.casinos.one_win.one_win import OneWin
 from src.domain.casinos.casino import Casino
 
 class Casinos(Enum):
     ONE_WIN = OneWin()
+    TEST = Test()
 
     @staticmethod
     def get_casino_or_fail(name: str) -> Casino:
@@ -18,5 +20,7 @@ class Casinos(Enum):
         match name.lower():
             case "one-win":
                 return Casinos.ONE_WIN.value
+            case "test":
+                return Casinos.TEST.value
             case _:
                 return None

@@ -32,6 +32,7 @@ class Scraper:
 
     async def controller(self, reader: StreamReader, writer: StreamWriter):
         try:
+            scraper = self
             receiver = await Receiver.create(reader)
 
             command = receiver.get_command()
@@ -41,14 +42,14 @@ class Scraper:
 
             match command:
                 case "status":
-                    res = self.status()
+                    res = scraper.status()
                 case "screenshot":
-                  res = await self.screenshot(arg)
+                  res = await scraper.screenshot(arg)
                 case "html":
-                  res = await self.html()
+                  res = await scraper.html()
                 case "stop":
                   res = "Stopping scraper..."
-                  ForegroundProcess.kill(self.close) # pyright: ignore
+                  ForegroundProcess.kill(scraper.close) # pyright: ignore
                 case _:
                   res = f"Unknown command: {command}"
             
@@ -59,6 +60,8 @@ class Scraper:
             await writer.wait_closed()
 
     async def run(self):
+        scraper = self
+
         navigator = Navigators.get_navigator_or_fail(self.__browser)
         casino = Casinos.get_casino_or_fail(self.__casino)
         game = Games.get_game_or_fail(self.__casino, self.__game)
@@ -72,7 +75,8 @@ class Scraper:
         browser = Browser(navigator)
 
         tab = await browser.open_tab()
-        await tab.console(self.__watcher) # pyright: ignore
+        
+        await tab.console(scraper.__watcher) # pyright: ignore
 
         await casino.prepare(tab)
         await game.play(tab)
@@ -107,6 +111,8 @@ class Scraper:
     
 
     async def __watcher(self, message: object) -> None:
+        Logger.debug(f"{message}")
+
         params = message.get("params")
         if not isinstance(params, dict):
             return

@@ -10,10 +10,10 @@ class OneWin(Casino):
     def __init__(self):
         name = 'one_win'
         display_name = '1Win'
-        domain = '1win.com'
         url = 'https://1win.com/'
+        domain = '1win.com'
 
-        playing_scripts: tuple[Script] | tuple[()] = tuple()
+        playing_scripts: tuple[Script, ...] | tuple[()] = tuple()
 
         super().__init__(name, url, display_name, domain, playing_scripts)
 

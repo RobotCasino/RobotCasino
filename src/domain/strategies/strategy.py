@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 class Strategy(ABC):
 
-    def __init__(self, playing_scripts: tuple[Script] | tuple[()] = tuple()):
+    def __init__(self, playing_scripts: tuple[Script, ...] | tuple[()] = tuple()):
         self._playing_scripts = playing_scripts
 
     async def load_scripts_to_tab_when_playing(self, tab: "Tab") -> None:

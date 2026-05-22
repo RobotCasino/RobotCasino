@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from src.web.tab import Tab
 
 class Casino(ABC):
-    def __init__(self, name: str, url: str, display_name: str, domain: str, playing_scripts: tuple[Script] | tuple[()] = tuple()) -> None:
+    def __init__(self, name: str, url: str, display_name: str, domain:str, playing_scripts: tuple[Script] | tuple[()] = tuple()) -> None:
         self.__name = name
         self.__url = url
         self.__display_name = display_name
@@ -28,9 +28,6 @@ class Casino(ABC):
     
     def get_domain(self):
         return self.__domain
-    
-    def _set_playing_scripts(self, scripts: tuple[Script]) -> None:
-        self._playing_scripts = scripts
 
     async def load_scripts_to_tab_when_playing(self, tab: "Tab") -> None:
         for script in self._playing_scripts:

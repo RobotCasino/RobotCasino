@@ -7,14 +7,17 @@ from src.domain.casinos.casino import Casino
 
 if TYPE_CHECKING:
     from src.web.tab import Tab
+    from src.domain.scripts.script import Script
 
 class Game(ABC):
-    def __init__(self, name: str, url: str):
+    def __init__(self, name: str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple()):
         self.__name = name
         self.__url = url
 
         self.__strategy: Strategy | None = None
         self.__casino: Casino | None = None
+
+        self._playing_scripts: tuple['Script', ...] | tuple[()] = playing_scripts
 
     @abstractmethod
     async def play(self, tab: 'Tab'):
@@ -51,3 +54,7 @@ class Game(ABC):
     def is_ready_or_fail(self) -> None:
         if self.__strategy is None or self.__casino is None:
             raise ValueError("Game is not ready. Missing strategy or casino.")
+        
+    async def load_scripts_to_tab_when_playing(self, tab: 'Tab'):
+        for script in self._playing_scripts:
+            await tab.execute_script(script)
