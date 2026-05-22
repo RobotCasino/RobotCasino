@@ -14,7 +14,7 @@ class Casino(ABC):
         self._playing_scripts: tuple[Script] | tuple[()] = playing_scripts
 
     @abstractmethod
-    async def prepare(self, tab: "Tab") -> None:
+    async def prepare_before_playing(self, tab: "Tab") -> None:
         pass
 
     def get_name(self):
