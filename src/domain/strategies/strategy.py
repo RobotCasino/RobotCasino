@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 from src.domain.scripts.script import Script
 
@@ -14,5 +14,6 @@ class Strategy(ABC):
         for script in self._playing_scripts:
            await tab.execute_script(script)
 
+    @abstractmethod
     async def prepare_before_playing(self, tab: "Tab") -> None:
         pass

@@ -10,5 +10,5 @@ class Test(Casino):
 
         super().__init__(name, url, display_name, domain)
 
-    async def prepare(self, tab: Tab):
+    async def prepare_before_playing(self, tab: Tab):
         await tab.go_to(self.get_url())
