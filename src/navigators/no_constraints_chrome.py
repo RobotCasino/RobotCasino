@@ -1,3 +1,5 @@
+import tempfile
+
 from os import getenv
 from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
@@ -8,6 +10,7 @@ from src.navigators.navigator import Navigator
 class NoConstraintsChrome(Navigator):
     def __init__(self):
         self.__chrome_binary_path = getenv("CHROME_BINARY_PATH")
+        self.__user_data_dir = getenv("CHROME_USER_DATA_DIR") or tempfile.mkdtemp(prefix="robotcasino-chrome-")
         self.__tabs: list[PydollTab] = []
         self.__navigator: Chrome | None = None
 
@@ -21,6 +24,7 @@ class NoConstraintsChrome(Navigator):
         options = ChromiumOptions()
         options.binary_location = self.__chrome_binary_path
         options.headless = False
+        options.add_argument(f"--user-data-dir={self.__user_data_dir}")
 
         return options
     

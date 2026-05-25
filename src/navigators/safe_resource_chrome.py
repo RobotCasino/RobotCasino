@@ -1,3 +1,5 @@
+import tempfile
+
 from pydoll.browser import Chrome
 from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
@@ -8,6 +10,7 @@ from src.navigators.navigator import Navigator
 class SafeResourceChrome(Navigator):
     def __init__(self):
         self.__chrome_binary_path = getenv("CHROME_BINARY_PATH")
+        self.__user_data_dir = getenv("CHROME_USER_DATA_DIR") or tempfile.mkdtemp(prefix="robotcasino-chrome-")
         self.__tabs: list[PydollTab] = []
         self.__navigator: Chrome | None = None
         
@@ -53,7 +56,7 @@ class SafeResourceChrome(Navigator):
         options.add_argument("--disable-gpu")
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-extensions")
-        options.add_argument('--user-data-dir=/tmp/chrome_dev')
+        options.add_argument(f"--user-data-dir={self.__user_data_dir}")
         options.add_argument("--disable-site-isolation-trials")
         options.add_argument("--hide-scrollbars")
         options.add_argument("--mute-audio")

@@ -1,5 +1,10 @@
 (function () 
 {
+    if (window.__RobotcasinoSimpleStrategyLoaded) {
+        return;
+    }
+    window.__RobotcasinoSimpleStrategyLoaded = true;
+
     class Strategy {
 
         constructor() {

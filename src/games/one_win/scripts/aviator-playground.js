@@ -1,4 +1,9 @@
 (function () {
+    if (window.__RobotcasinoPlaygroundLoaded) {
+        return;
+    }
+    window.__RobotcasinoPlaygroundLoaded = true;
+
     class AviatorPlayground {
         constructor() {
             this.STATES = Object.freeze({

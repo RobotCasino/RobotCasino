@@ -126,19 +126,3 @@ def status():
             rich.print(res.get("result"))
     except Exception:
         rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)
-
-@app.command(short_help="Shows the HTML content of the current page.")
-def html():
-    try:
-        sender = Sender(str(SOCKET_PATH))
-
-        res = sender.send({
-            "cmd": "get_html",
-            "arguments": "",
-        })
-
-        if res is not None:
-            print(res.get("result"))
-
-    except Exception:
-        rich.print(":warning: Unable to connect to the Scraper process. Is it running?", file=sys.stderr)

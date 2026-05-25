@@ -6,8 +6,6 @@ from time import monotonic
 
 from asyncio import StreamReader, StreamWriter
 
-from aiohttp import web
-
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.ipc.receiver import Receiver
 from src.infrastructure.process.foreground import ForegroundProcess
@@ -34,7 +32,6 @@ class Scraper:
         self.__strategy = strategy
 
         self.__active_tab: Tab | None = None
-        self.__exit_runner: web.AppRunner | None = None
 
         Metadata.set_dictionary(extra_params)
 
@@ -53,8 +50,6 @@ class Scraper:
                     res = scraper.status()
                 case "screenshot":
                   res = await scraper.screenshot(arg)
-                case "html":
-                  res = await scraper.html()
                 case "stop":
                   res = "Stopping scraper..."
                   ForegroundProcess.kill(scraper.close) # pyright: ignore
@@ -86,7 +81,7 @@ class Scraper:
 
         self.__active_tab = tab
 
-        await self.__start_exit_server()
+        await tab.console(scraper.__watcher) # pyright: ignore
 
         blocked_urls = (
             "doubleclick.net",
@@ -104,21 +99,15 @@ class Scraper:
         check_interval = int(getenv("MEMORY_CHECK_INTERVAL_SECONDS", "60"))
         max_session_seconds = int(getenv("MAX_SESSION_SECONDS", "3600"))
 
-        console_enabled = False
-
         while True:
             await casino.prepare_before_playing(tab)
             await strategy.prepare_before_playing(tab)
-
-            if not console_enabled:
-                await tab.console(scraper.__watcher) # pyright: ignore
-                console_enabled = True
 
             await tab.disable_request_blocking()
             await game.play(tab)
 
             await tab.enable_request_blocking(
-                {ResourceType.IMAGE, ResourceType.MEDIA, ResourceType.FONT},
+                {ResourceType.IMAGE},
                 blocked_url_substrings=blocked_urls,
             )
 
@@ -142,49 +131,11 @@ class Scraper:
             await tab.sleep(5)
 
     async def close(self):
-        await self.__stop_exit_server()
         if self.__active_tab:
             try:
                 await self.__active_tab.close()
             except Exception:
                 pass
-
-    async def __handle_exit_signal(self, request: web.Request) -> web.Response:
-        payload = {}
-        try:
-            payload = await request.json()
-        except Exception:
-            payload = {}
-
-        message = payload.get("message") or payload.get("reason") or ""
-        Logger.warning(f"[BROWSER] [EXIT] {message}")
-        ForegroundProcess.kill(self.close)
-        return web.json_response({"ok": True})
-
-    async def __start_exit_server(self) -> None:
-        if self.__exit_runner is not None:
-            return
-
-        app = web.Application()
-        app.add_routes([web.post("/exit", self.__handle_exit_signal)])
-
-        runner = web.AppRunner(app)
-        await runner.setup()
-
-        host = getenv("EXIT_SIGNAL_HOST", "127.0.0.1")
-        port = int(getenv("EXIT_SIGNAL_PORT", "8081"))
-
-        site = web.TCPSite(runner, host, port)
-        await site.start()
-
-        self.__exit_runner = runner
-
-    async def __stop_exit_server(self) -> None:
-        if self.__exit_runner is None:
-            return
-
-        await self.__exit_runner.cleanup()
-        self.__exit_runner = None
 
     def __bytes_to_mb(self, value: int) -> int:
         return int(value / (1024 * 1024))
@@ -230,12 +181,6 @@ class Scraper:
         
         await self.__active_tab.take_screenshot(path)
         return f":camera: Screenshot saved to {path}"
-    
-    async def html(self) -> str:
-        if self.__active_tab is None:
-            return ""
-
-        return await self.__active_tab.html()
     
     def status(self) -> str:
         lines: list[str] = []

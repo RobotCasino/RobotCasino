@@ -1,4 +1,9 @@
 (function() {
+    if (window.__RobotcasinoCleanerLoaded) {
+        return;
+    }
+    window.__RobotcasinoCleanerLoaded = true;
+
     class Cleaner {
         static consoleCleanerID = null;
         static iframe = null;
@@ -13,6 +18,7 @@
 
             Cleaner.DisableAnimations();
             Cleaner.FilterConsoleNoise();
+            Cleaner.CleanStorage();
         }
 
         static RemoveOtherBetsPanel() {
@@ -58,6 +64,45 @@
             console.log = (...args) => { if (allow(args)) originalLog(...args); };
             console.info = (...args) => { if (allow(args)) originalInfo(...args); };
             console.warn = (...args) => { if (allow(args)) originalWarn(...args); };
+        }
+
+        static CleanStorage() {
+            try {
+                if (!location.hostname.includes('spribelaunch.com')) {
+                    return;
+                }
+            } catch (error) {
+                return;
+            }
+
+            try {
+                sessionStorage.clear();
+            } catch (error) {
+                // Ignore storage cleanup failures
+            }
+
+            try {
+                localStorage.clear();
+            } catch (error) {
+                // Ignore storage cleanup failures
+            }
+
+            try {
+                if ('caches' in window) {
+                    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key)));
+                }
+            } catch (error) {
+                // Ignore cache cleanup failures
+            }
+
+            try {
+                if (navigator.serviceWorker) {
+                    navigator.serviceWorker.getRegistrations()
+                        .then((regs) => regs.forEach((reg) => reg.unregister()));
+                }
+            } catch (error) {
+                // Ignore service worker cleanup failures
+            }
         }
 
         static querySelector(selector) {
