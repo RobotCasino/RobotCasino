@@ -17,24 +17,10 @@ ERROR_LOG_PATH = OUTPUT_DIR / "errors.log"
 
 
 def init():
-    """Initialize directories and files required by the application.
-    
-    Call this once at startup instead of relying on import-time side effects.
-    """
     os.makedirs(LOGS_DIR, exist_ok=True)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     CONSOLE_LOG_PATH.touch(exist_ok=True)
     ERROR_LOG_PATH.touch(exist_ok=True)
-
-
-def get_environment(key: str, default: str = None) -> str:
-    r = os.getenv(key)
-
-    if r is None and default is None:
-        raise ValueError(f'Environment variable {key} not found')
-    
-    return r
-
 
 __ALL__ = [
     "BASE_DIR", "PROJECT_DIR", "IS_HEADLESS", "LOGS_DIR", "IS_DOCKER",

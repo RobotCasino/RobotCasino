@@ -103,16 +103,20 @@ class Tab:
     async def reload(self) -> None:
         await self.__page.refresh()
 
-    async def block_image_requests(self):
-        await self.enable_request_blocking({ResourceType.IMAGE})
-
     async def enable_request_blocking(
         self,
-        blocked_resource_types: set[ResourceType],
-        blocked_url_substrings: tuple[str, ...] = (),
     ) -> None:
-        self.__blocked_resource_types = {resource_type.value for resource_type in blocked_resource_types}
-        self.__blocked_url_substrings = blocked_url_substrings
+        self.__blocked_resource_types = {ResourceType.IMAGE}
+        self.__blocked_url_substrings = (
+            "doubleclick.net",
+            "googletagmanager.com",
+            "google-analytics.com",
+            "stats.g.doubleclick.net",
+            "facebook.net",
+            "facebook.com/tr",
+            "/analytics",
+            "/collect",
+        )
 
         await self.__page.enable_fetch_events(request_stage=RequestStage.REQUEST)
 

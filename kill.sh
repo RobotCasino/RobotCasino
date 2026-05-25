@@ -1,0 +1,1 @@
+docker stop robotcasino && docker rm robotcasino

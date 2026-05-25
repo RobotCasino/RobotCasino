@@ -23,6 +23,10 @@ class Aviator(Game):
         strategy = self.get_strategy_or_fail()
 
         await tab.go_to(self.get_url())
+    
+        await tab.reload()
+
+        await tab.sleep(5)
 
         await self.set_game_balance_currency(tab)
         await self.wait_for_aviator_iframe_to_load(tab)

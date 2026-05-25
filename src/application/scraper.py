@@ -6,7 +6,7 @@ from time import monotonic
 
 from asyncio import StreamReader, StreamWriter
 
-from aiohttp.web_urldispatcher import Resource
+from src.infrastructure.process.resources import Resources
 
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.ipc.receiver import Receiver
@@ -22,7 +22,6 @@ from src.strategies.strategies import Strategies
 
 from src.utils.metadata import Metadata
 from src.utils.browser_console import BrowserConsole
-from pydoll.protocol.network.types import ResourceType
 
 class Scraper:
     def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] = {}) -> None:
@@ -65,8 +64,6 @@ class Scraper:
             await writer.wait_closed()
 
     async def run(self):
-        scraper = self
-
         navigator = Navigators.get_navigator_or_fail(self.__browser)
         casino = Casinos.get_casino_or_fail(self.__casino)
         game = Games.get_game_or_fail(self.__casino, self.__game)
@@ -80,55 +77,30 @@ class Scraper:
         browser = Browser(navigator)
 
         tab = await browser.open_tab()
+        await tab.enable_request_blocking()
 
         self.__active_tab = tab
 
-        await tab.console(scraper.__watcher) # pyright: ignore
+        await tab.console(self.__watcher) # pyright: ignore
 
-        blocked_urls = (
-            "doubleclick.net",
-            "googletagmanager.com",
-            "google-analytics.com",
-            "stats.g.doubleclick.net",
-            "facebook.net",
-            "facebook.com/tr",
-            "/analytics",
-            "/collect",
-        )
-
-        memory_limit = self.__get_memory_limit_bytes()
-        memory_ratio = float(getenv("MEMORY_RELOAD_RATIO", "0.85"))
-        check_interval = int(getenv("MEMORY_CHECK_INTERVAL_SECONDS", "60"))
-        max_session_seconds = int(getenv("MAX_SESSION_SECONDS", "3600"))
+        await casino.prepare_before_playing(tab)
+        await strategy.prepare_before_playing(tab)
 
         while True:
-            await casino.prepare_before_playing(tab)
-            await strategy.prepare_before_playing(tab)
-
-            await tab.disable_request_blocking()
             await game.play(tab)
 
-            await tab.enable_request_blocking(
-                {ResourceType.IMAGE, ResourceType.MEDIA, ResourceType.FONT},
-                blocked_url_substrings=blocked_urls,
-            )
-
-            session_start = monotonic()
-            
             while True:
-                await tab.sleep(check_interval)
+                await tab.sleep(60)
 
-                if max_session_seconds > 0 and (monotonic() - session_start) >= max_session_seconds:
-                    Logger.info("Max session reached. Reloading to release memory.")
+                if Resources.is_memory_limit_reached():
+                    memory_usage_mb = Resources.bytes_to_mb(Resources.get_memory_usage_as_bytes_or_fail())
+                    memory_limit_mb = Resources.bytes_to_mb(Resources.get_memory_limit_as_bytes_or_fail())
+
+                    Logger.warning(
+                        f"Memory threshold reached: {memory_usage_mb}MB / {memory_limit_mb}MB. Reloading."
+                    )
+                    
                     break
-
-                if memory_limit:
-                    usage = self.__get_memory_usage_bytes()
-                    if usage is not None and usage >= int(memory_limit * memory_ratio):
-                        Logger.warning(
-                            f"Memory threshold reached: {self.__bytes_to_mb(usage)}MB / {self.__bytes_to_mb(memory_limit)}MB. Reloading."
-                        )
-                        break
 
             await tab.reload()
             await tab.sleep(5)
@@ -139,44 +111,6 @@ class Scraper:
                 await self.__active_tab.close()
             except Exception:
                 pass
-
-    def __bytes_to_mb(self, value: int) -> int:
-        return int(value / (1024 * 1024))
-
-    def __read_cgroup_value(self, paths: tuple[str, ...]) -> int | None:
-        for path in paths:
-            try:
-                with open(path, "r", encoding="utf-8") as handle:
-                    raw_value = handle.read().strip()
-
-                if raw_value == "max":
-                    return None
-
-                value = int(raw_value)
-                if value > (1 << 60):
-                    return None
-
-                return value
-            except (FileNotFoundError, ValueError, OSError):
-                continue
-
-        return None
-
-    def __get_memory_usage_bytes(self) -> int | None:
-        return self.__read_cgroup_value(
-            (
-                "/sys/fs/cgroup/memory.current",
-                "/sys/fs/cgroup/memory/memory.usage_in_bytes",
-            )
-        )
-
-    def __get_memory_limit_bytes(self) -> int | None:
-        return self.__read_cgroup_value(
-            (
-                "/sys/fs/cgroup/memory.max",
-                "/sys/fs/cgroup/memory/memory.limit_in_bytes",
-            )
-        )
 
     async def screenshot(self, path: str) -> str:
         if self.__active_tab is None:
