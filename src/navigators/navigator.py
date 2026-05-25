@@ -11,4 +11,7 @@ class Navigator(ABC):
     async def close(self) -> None:
         pass
 
+    async def get_memory_usage_bytes(self) -> int | None:
+        return None
+
 __ALL__ = ['Navigator']

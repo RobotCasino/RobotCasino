@@ -6,6 +6,8 @@ from time import monotonic
 
 from asyncio import StreamReader, StreamWriter
 
+from aiohttp.web_urldispatcher import Resource
+
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.ipc.receiver import Receiver
 from src.infrastructure.process.foreground import ForegroundProcess
@@ -107,11 +109,12 @@ class Scraper:
             await game.play(tab)
 
             await tab.enable_request_blocking(
-                {ResourceType.IMAGE},
+                {ResourceType.IMAGE, ResourceType.MEDIA, ResourceType.FONT},
                 blocked_url_substrings=blocked_urls,
             )
 
             session_start = monotonic()
+            
             while True:
                 await tab.sleep(check_interval)
 
