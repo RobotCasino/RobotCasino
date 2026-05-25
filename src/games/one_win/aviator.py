@@ -1,58 +1,59 @@
+from src.infrastructure.config import BASE_DIR
 from src.domain.games.game import Game
 from src.web.tab import Tab
 from src.web.element import Element
+from src.domain.scripts.script import Script
 
 class Aviator(Game):
 
     def __init__(self):
-        super().__init__("Aviator", "https://1win.com/casino/play/v_spribe:aviator")
+        playing_scripts: tuple[Script, ...] = (
+            Script("Cleaner Script", f"{BASE_DIR}/games/one_win/scripts/aviator-cleaner.js"),
+            Script("Playground Script", f"{BASE_DIR}/games/one_win/scripts/aviator-playground.js"),
+        )
+
+        game_domain_scripts: tuple[Script, ...] = (
+            Script('Domain Game Script', f'{BASE_DIR}/domain/games/scripts/aviator.js'),
+        )
+
+        super().__init__("Aviator", "https://1win.com/casino/play/v_spribe:aviator", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
 
     async def play(self, tab: Tab):
-        game = self
         casino = self.get_casino_or_fail()
         strategy = self.get_strategy_or_fail()
 
         await tab.go_to(self.get_url())
 
+        await self.set_game_balance_currency(tab)
+        await self.wait_for_aviator_iframe_to_load(tab)
+
+        await tab.sleep(2)
+
+        await self.load_scripts_to_tab_when_playing(tab)
         await casino.load_scripts_to_tab_when_playing(tab)
         await strategy.load_scripts_to_tab_when_playing(tab)
-        await game.load_scripts_to_tab_when_playing(tab)
 
+    async def set_game_balance_currency(self, tab: Tab):
+        currency_panel = await tab.find_element_by_xpath_or_fail("//div[@class = 'game-play-card_currencyButton-bVSBd']/parent::div")
 
-    async def _load_strategy(self, iframe: Element):
-        pass
-        # utils_script = ScriptLoader.get_game_utils_script()
-        # general_script = ScriptLoader.get_general_game_script(self.get_casino(), self.get_name())
-        # domain_script = ScriptLoader.get_game_domain_script(self.get_name())
-        # observer_script = ScriptLoader.get_game_observer_script()
-        # strategy_script = StrategyLoader.get_strategy_script_with_payload(
-        #     self.get_name(),
-        #     self.get_strategy(),
-        #     self.get_user_data()
-        # )
-
-        # await iframe.execute_script(utils_script)
-        # await iframe.execute_script(domain_script)
-        # await iframe.execute_script(observer_script)
-        # await iframe.execute_script(strategy_script)
-        # await iframe.execute_script(general_script)
+        await currency_panel.click()
         
-    async def __select_and_init_game(self, tab: Tab): # pyright: ignore
-        play_btn = await tab.find_element('')
+        await tab.sleep(1)
 
-        return
+        currency_button = await tab.find_element_by_xpath_or_fail("//div[text() = 'USD']/ancestor::button")
 
-        if isinstance(play_btn, WebElement):
-            await play_btn.click()
+        await currency_button.click()
+        
+        await tab.sleep(1)
 
-    async def __get_iframe(self, tab: Tab) -> Element | bool: # pyright: ignore
-        iframe_element = await tab.find_element('iframe')
+        play_button = await tab.find_element_by_xpath_or_fail("//div[text() = 'Play']/ancestor::button")
 
-        return False
+        await play_button.click_by_cdp()
 
-        if not isinstance(iframe_element, WebElement):
-            raise ValueError('Aviator iframe element not found')
-    
-        return iframe_element
+        await tab.sleep(2)
+
+    async def wait_for_aviator_iframe_to_load(self, tab: Tab) -> None:
+        iframe = await tab.find_element_by_xpath_or_fail("//iframe[contains(@src, 'spribelaunch.com/aviator')]")
+        await iframe.find_element_by_xpath_or_fail("//div[@class = 'game-logo']")
 
 __ALL__ = ['Aviator']

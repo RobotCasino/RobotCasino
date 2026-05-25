@@ -19,10 +19,10 @@ class Game(ABC):
         self.__strategy: Strategy | None = None
         self.__casino: Casino | None = None
 
-        self._playing_scripts: tuple['Script', ...] | tuple[()] = playing_scripts
-        self._domain_scripts: tuple['Script', ...] | tuple[()] = domain_scripts
+        self._playing_scripts = playing_scripts
+        self._domain_scripts = domain_scripts 
 
-        self.__util_scripts: tuple['Script'] = (
+        self.__util_scripts: tuple['Script', ...] = (
             Script('Util Script', f'{BASE_DIR}/domain/games/scripts/scraper.js'),
         )
 

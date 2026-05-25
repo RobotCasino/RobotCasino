@@ -1,5 +1,9 @@
 from pydoll.browser.tab import Tab as PydollTab
 from pydoll.protocol.runtime.events import RuntimeEvent
+from pydoll.protocol.fetch.events import FetchEvent
+from pydoll.protocol.fetch.types import RequestStage
+from pydoll.constants import By
+from pydoll.protocol.network.types import ResourceType, ErrorReason
 from asyncio import sleep
 
 from collections.abc import Callable
@@ -15,6 +19,10 @@ class Tab:
         self.__cookies: list[Cookie] = []
 
         self.__page = tab
+        self.__fetch_listener_id: int | None = None
+        self.__blocked_resource_types: set[str] = set()
+        self.__blocked_url_substrings: tuple[str, ...] = ()
+
 
     async def add_cookie(self, cookie: Cookie):
         self.__cookies.append(cookie)
@@ -52,8 +60,39 @@ class Tab:
 
         await self.__page.on(RuntimeEvent.CONSOLE_API_CALLED, callback) # pyright: ignore
 
-    async def find_element(self, element: str) -> Element | None:
-        pass
+    async def find_element_by_css_selector(self, selector: str) -> Element | None:
+        try:
+            web_element = await self.__page.find_or_wait_element(By.CSS_SELECTOR, selector, timeout=60)
+            if web_element:
+                return Element(web_element)
+        except Exception:
+            pass
+        
+        return None
+
+    async def find_element_by_css_selector_or_fail(self, selector: str) -> Element:
+        web_element = await self.__page.find_or_wait_element(By.CSS_SELECTOR, selector, timeout=60)
+        if web_element:
+            return Element(web_element)
+        
+        raise Exception(f"Element with selector '{selector}' not found")
+
+    async def find_element_by_xpath(self, xpath: str) -> Element | None:
+        try:
+            web_element = await self.__page.find_or_wait_element(By.XPATH, xpath, timeout=60)
+            if web_element:
+                return Element(web_element)
+        except Exception:
+            pass
+        
+        return None
+
+    async def find_element_by_xpath_or_fail(self, xpath: str) -> Element:
+        web_element = await self.__page.find_or_wait_element(By.XPATH, xpath, timeout=60)
+        if web_element:
+            return Element(web_element)
+        
+        raise Exception(f"Element with xpath '{xpath}' not found")
 
     async def execute_script(self, script: Script) -> None:
         await self.__page.execute_script(str(script))
@@ -63,5 +102,53 @@ class Tab:
     
     async def reload(self) -> None:
         await self.__page.refresh()
+
+    async def block_image_requests(self):
+        await self.enable_request_blocking({ResourceType.IMAGE})
+
+    async def enable_request_blocking(
+        self,
+        blocked_resource_types: set[ResourceType],
+        blocked_url_substrings: tuple[str, ...] = (),
+    ) -> None:
+        self.__blocked_resource_types = {resource_type.value for resource_type in blocked_resource_types}
+        self.__blocked_url_substrings = blocked_url_substrings
+
+        await self.__page.enable_fetch_events(request_stage=RequestStage.REQUEST)
+
+        async def on_request_paused(message: dict) -> None:
+            params = message.get("params", {}) if isinstance(message, dict) else {}
+            request_id = params.get("requestId")
+            if not request_id:
+                return
+
+            request = params.get("request", {}) if isinstance(params, dict) else {}
+            url = request.get("url", "")
+            resource_type = params.get("resourceType")
+            resource_value = resource_type.value if isinstance(resource_type, ResourceType) else str(resource_type or "")
+
+            should_block = resource_value in self.__blocked_resource_types
+            if not should_block and url:
+                for token in self.__blocked_url_substrings:
+                    if token in url:
+                        should_block = True
+                        break
+
+            try:
+                if should_block:
+                    await self.__page.fail_request(request_id, ErrorReason.BLOCKED_BY_CLIENT)
+                else:
+                    await self.__page.continue_request(request_id)
+            except Exception:
+                try:
+                    await self.__page.continue_request(request_id)
+                except Exception:
+                    pass
+
+        if self.__fetch_listener_id is None:
+            self.__fetch_listener_id = await self.__page.on(FetchEvent.REQUEST_PAUSED, on_request_paused)
+
+    async def disable_request_blocking(self) -> None:
+        await self.__page.disable_fetch_events()
 
 __ALL__ = ['Tab']

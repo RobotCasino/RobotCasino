@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+from src.infrastructure.config import BASE_DIR
 from src.domain.scripts.script import Script
 
 if TYPE_CHECKING:
@@ -8,7 +9,11 @@ if TYPE_CHECKING:
 class Strategy(ABC):
 
     def __init__(self, playing_scripts: tuple[Script, ...] | tuple[()] = tuple()):
-        self._playing_scripts = playing_scripts
+        verification_scripts: tuple[Script, ...] = (
+            Script("Strategier", f"{BASE_DIR}/domain/strategies/scripts/strategier.js"),
+        )
+       
+        self._playing_scripts = verification_scripts + playing_scripts
 
     async def load_scripts_to_tab_when_playing(self, tab: "Tab") -> None:
         for script in self._playing_scripts:
