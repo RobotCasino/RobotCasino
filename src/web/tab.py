@@ -114,7 +114,14 @@ class Tab:
         self.__blocked_resource_types = {resource_type.value for resource_type in blocked_resource_types}
         self.__blocked_url_substrings = blocked_url_substrings
 
-        await self.__page.enable_fetch_events(request_stage=RequestStage.REQUEST)
+        resource_filter = None
+        if len(blocked_resource_types) == 1:
+            resource_filter = next(iter(blocked_resource_types))
+
+        await self.__page.enable_fetch_events(
+            request_stage=RequestStage.REQUEST,
+            resource_type=resource_filter,
+        )
 
         async def on_request_paused(message: dict) -> None:
             params = message.get("params", {}) if isinstance(message, dict) else {}
