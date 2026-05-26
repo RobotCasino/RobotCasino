@@ -34,9 +34,5 @@ class OneWin(Casino):
 
         await tab.sleep(5)
 
-        await tab.go_to(self.get_url())
-
-        await tab.sleep(5)
-
     
 __ALL__ = ['OneWin']

@@ -1,6 +1,5 @@
 FROM python:3.11-alpine
 
-# Install Chromium and the absolute minimum system layer dependencies
 RUN apk update && apk add --no-cache \
     chromium \
     harfbuzz \

@@ -8,10 +8,6 @@
             })
 
             window.Cleaner.Init()
-            window.Cleaner.RemoveOtherBetsPanel()
-            window.Cleaner.RemoveChat()
-            window.Cleaner.RemoveSecondBetPanel()
-            window.Cleaner.StartConsoleCleaning()
 
             this.iframe = document.evaluate("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
             this.contentDocument = this.iframe ? this.iframe.contentDocument : document;

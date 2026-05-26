@@ -1,9 +1,4 @@
 (function () {
-    if (window.__RobotcasinoStrategierLoaded) {
-        return;
-    }
-    window.__RobotcasinoStrategierLoaded = true;
-
     class Strategier {
         static verify() {
             this.Scraper = window.Scraper;

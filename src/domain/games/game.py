@@ -27,7 +27,7 @@ class Game(ABC):
         )
 
     @abstractmethod
-    async def play(self, tab: 'Tab'):
+    async def play(self, tab: 'Tab') -> None:
         pass
 
     def get_name(self):

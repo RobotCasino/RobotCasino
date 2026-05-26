@@ -3,10 +3,12 @@ from enum import Enum
 from src.casinos.test.test import Test
 from src.casinos.one_win.one_win import OneWin
 from src.domain.casinos.casino import Casino
+from src.casinos.mystake.mystake import Mystake
 
 class Casinos(Enum):
     ONE_WIN = OneWin()
     TEST = Test()
+    MYSTAKE = Mystake()
 
     @staticmethod
     def get_casino_or_fail(name: str) -> Casino:
@@ -22,5 +24,7 @@ class Casinos(Enum):
                 return Casinos.ONE_WIN.value
             case "test":
                 return Casinos.TEST.value
+            case "mystake":
+                return Casinos.MYSTAKE.value
             case _:
                 return None

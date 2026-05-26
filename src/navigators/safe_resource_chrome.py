@@ -65,7 +65,34 @@ class SafeResourceChrome(Navigator):
         options.add_argument("--mute-audio")
         options.add_argument("--disable-plugins")
         options.add_argument("--disable-extensions")
+        options.add_argument("--disable-notifications")
+
         
+        # Blocking APIs and WebGL drastically reduces memory footprint 
+        # for canvas-heavy games if you only interact with the DOM via scraping
+        options.add_argument("--disable-webgl")
+        options.add_argument("--disable-3d-apis")
+        options.add_argument("--disable-permissions-api")
+        options.add_argument("--disable-speech-api")
+        options.add_argument("--disable-webrtc")
+        
+
+        # Disable logging and crash reporting memory overhead
+        options.add_argument("--disable-logging")
+        options.add_argument("--disable-crash-reporter")
+        options.add_argument("--disable-in-process-stack-traces")
+        
+        # --- Extreme Reductions ---
+        # options.add_argument("--disable-remote-fonts") # Both flags 
+        # options.add_argument("--disable-reading-from-canvas") # cause problems with the iframe! NEVER USE THEM
+        options.add_argument("--disable-client-side-phishing-detection")
+        options.add_argument("--disable-component-extensions-with-background-pages")
+        options.add_argument("--disable-default-apps")
+        options.add_argument("--disable-ipc-flooding-protection")
+        options.add_argument("--disable-background-timer-throttling")
+        options.add_argument("--metrics-recording-only")
+        options.add_argument("--v8-cache-options=none")
+
         # Block image rendering entirely at the engine level
         options.add_argument("--blink-settings=imagesEnabled=true") 
 
@@ -75,7 +102,6 @@ class SafeResourceChrome(Navigator):
         options.add_argument("--disable-background-networking")
         options.add_argument("--disable-backgrounding-occluded-windows")
         options.add_argument("--disable-renderer-backgrounding")
-        options.add_argument("--disable-default-apps")
         options.add_argument("--disable-sync")
         options.add_argument("--disable-translate")
 
@@ -85,8 +111,8 @@ class SafeResourceChrome(Navigator):
         options.add_argument("--disable-application-cache")
 
         # --- Fixed V8 Execution Engine Flags ---
-        # Passing them using equal signs inside a clean string ensures Chromium's parser reads both
-        options.add_argument('--js-flags="--max-old-space-size=300 --expose-gc"')
+        # Aggressive GC flags: force global GC, optimize for size, and flush compiled code
+        options.add_argument("--js-flags=--max-old-space-size=250 --expose-gc --optimize-for-size --flush-bytecode --gc-global")
 
         options.add_argument("--user-agent=Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
         return options
