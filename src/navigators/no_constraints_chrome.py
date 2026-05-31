@@ -22,9 +22,10 @@ class NoConstraintsChrome(Navigator):
             raise ValueError("CHROME_BINARY_PATH environment variable is not set")
 
         options = ChromiumOptions()
+        options._start_timeout = 120 # pyright: ignore
         options.binary_location = self.__chrome_binary_path
         options.headless = False
-        options.add_argument(f"--user-data-dir={self.__user_data_dir}")
+        options.add_argument('--user-data-dir=/tmp/chrome_dev')
 
         return options
     

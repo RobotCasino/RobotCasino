@@ -1,8 +1,5 @@
-import re
+from enum import Enum
 import json
-
-from os import getenv
-from time import monotonic
 
 from asyncio import StreamReader, StreamWriter
 
@@ -24,6 +21,15 @@ from src.utils.metadata import Metadata
 from src.utils.browser_console import BrowserConsole
 
 class Scraper:
+
+    class States(Enum):
+        INITIALIZING = "initializing"
+        READY = "ready"
+        PLAYING = "playing"
+        WAITING = "waiting"
+        RELOADING = "reloading"
+        OBSERVING = "observing"
+
     def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] = {}) -> None:
         Logger.info(f"Starting scraper with browser={browser}, casino={casino}, game={game}, strategy={strategy}")
 
@@ -33,6 +39,8 @@ class Scraper:
         self.__strategy = strategy
 
         self.__active_tab: Tab | None = None
+
+        self.__state = Scraper.States.INITIALIZING
 
         Metadata.set_dictionary(extra_params)
 
@@ -92,7 +100,7 @@ class Scraper:
             while True:
                 await tab.sleep(60)
 
-                if Resources.is_memory_limit_reached():
+                if Resources.is_memory_limit_reached() and self.__is_scraper_waiting():
                     memory_usage_mb = Resources.bytes_to_mb(Resources.get_memory_usage_as_bytes_or_fail())
                     memory_limit_mb = Resources.bytes_to_mb(Resources.get_memory_limit_as_bytes_or_fail())
 
@@ -143,9 +151,20 @@ class Scraper:
                 ForegroundProcess.kill(self.close)
             case "LOG":
                 Logger.info(payload)
-            case "BET":
-                Logger.info(payload)
             case "WAITING":
+                self.__state = Scraper.States.WAITING
+
                 Logger.info(payload)
+            case "PLAYING":
+                self.__state = Scraper.States.PLAYING
+
+                Logger.info(payload)
+            case "OBSERVING":
+                self.__state = Scraper.States.OBSERVING
+                
+                Logger.info(payload)
+
+    async def __is_scraper_waiting(self) -> bool:
+        return self.__state is self.States.WAITING
 
 __ALL__ = ["Scraper"]

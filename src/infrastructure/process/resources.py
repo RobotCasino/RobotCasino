@@ -2,6 +2,8 @@
 from src.utils.file_reader import FileReader
 from os import getenv
 
+from src.utils.metadata import Metadata
+
 class Resources:
 
     __memory_limit_as_bytes: int | None = None
@@ -36,7 +38,15 @@ class Resources:
     
     @staticmethod
     def get_memory_limit_as_bytes() -> int | None:
-        return Resources.__memory_limit_as_bytes or Resources.__read_cgroup_value(
+        if Resources.__memory_limit_as_bytes is not None:
+            return Resources.__memory_limit_as_bytes
+
+        memory_limit_env = Metadata.get("MEMORY_LIMIT")
+        
+        if memory_limit_env is not None:
+            return int(memory_limit_env) * 1024 * 1024
+
+        return Resources.__read_cgroup_value(
             (
                 "/sys/fs/cgroup/memory.max",
                 "/sys/fs/cgroup/memory/memory.limit_in_bytes",

@@ -1,9 +1,4 @@
 (function() {
-    if (window.__RobotcasinoAviatorLoaded) {
-        return;
-    }
-    window.__RobotcasinoAviatorLoaded = true;
-
     class Aviator {
         static isBlue(multiplier) {
             return multiplier >= 1 && multiplier < 2

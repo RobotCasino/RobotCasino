@@ -1,10 +1,5 @@
 (function () 
 {
-    if (window.__RobotcasinoSimpleStrategyLoaded) {
-        return;
-    }
-    window.__RobotcasinoSimpleStrategyLoaded = true;
-
     class Strategy {
 
         constructor() {
@@ -18,10 +13,16 @@
 
             this.Scraper = window.Scraper
             this.Playground = window.Playground
+            this.Util = window.Util
         }
 
         start() {
+            this.Util.observe('.payouts-block', (node, mutation) => {
+                window.Scraper.log(JSON.stringify(mutation))
+                window.Scraper.log(JSON.stringify(node))
 
+                window.Scraper.exitWithMessage('Payouts block changed')
+            })
         }
 
         kill(message = null) {

@@ -23,7 +23,8 @@ class Game(ABC):
         self._domain_scripts = domain_scripts 
 
         self.__util_scripts: tuple['Script', ...] = (
-            Script('Util Script', f'{BASE_DIR}/domain/games/scripts/scraper.js'),
+            Script('Util Script', f'{BASE_DIR}/domain/games/scripts/util.js'),
+            Script('Scraper Util Script', f'{BASE_DIR}/domain/games/scripts/scraper.js'),
         )
 
     @abstractmethod
