@@ -85,9 +85,10 @@ class Scraper:
         browser = Browser(navigator)
 
         tab = await browser.open_tab()
-        await tab.enable_request_blocking()
-
         self.__active_tab = tab
+
+        if navigator.is_optimized_for_low_memory():
+            await tab.enable_request_blocking()
 
         await tab.console(self.__watcher) # pyright: ignore
 

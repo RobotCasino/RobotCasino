@@ -1,68 +1,65 @@
 (function () {
     class Cleaner {
-        static consoleCleanerID = null;
-        static iframe = null;
+        constructor() {
+            this.iframe = document.evaluate("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+            this.contentDocument = this.iframe ? this.iframe.contentDocument : document
 
-        static Init() {
-            Cleaner.iframe = document.evaluate("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
-            Cleaner.contentDocument = Cleaner.iframe ? Cleaner.iframe.contentDocument : document
-
-            if (!Cleaner.contentDocument.body) {
+            if (!this.contentDocument.body) {
                 window.Scraper.exitWithMessage('Aviator frame not found. Please make sure you are on the Aviator game page.')
             }
 
-            Cleaner.RemoveOtherBetsPanel()
-            Cleaner.RemoveChat()
-            Cleaner.RemoveSecondBetPanel()
-            Cleaner.DisableAnimations()
-            Cleaner.RemoveAirstrip()
-            Cleaner.RemoveBetCounting()
-            Cleaner.RemoveOneWinSidebar()
-            Cleaner.RemoveOneWinNav()
-            Cleaner.RemoveOneWinFooter()
+            this.RemoveOtherBetsPanel()
+            this.RemoveChat()
+            this.RemoveSecondBetPanel()
+            this.DisableAnimations()
+            this.RemoveAirstrip()
+            this.RemoveBetCounting()
+            this.RemoveOneWinSidebar()
+            this.RemoveOneWinNav()
+            this.RemoveOneWinFooter()
         }
 
-        static RemoveOtherBetsPanel() {
-            Cleaner.querySelector('app-bets-widget')?.remove()
-            Cleaner.querySelector('app-bets-widget .bets-block')?.remove()
-            Cleaner.querySelector('.bets-widget-container')?.remove()
+        RemoveOtherBetsPanel() {
+            this.querySelector('app-bets-widget')?.remove()
+            this.querySelector('app-bets-widget .bets-block')?.remove()
+            this.querySelector('.bets-widget-container')?.remove()
         }
 
-        static RemoveChat() {
-            Cleaner.querySelector('.chat-bar.ng-star-inserted')?.remove()
-            const gamePlay = Cleaner.querySelector('.game-play');
+        RemoveChat() {
+            this.querySelector('.chat-bar.ng-star-inserted')?.remove()
+            const gamePlay = this.querySelector('.game-play');
             if (gamePlay) {
                 gamePlay.style.setProperty('width', '100%', 'important');
             }
         }
 
-        static RemoveSecondBetPanel() {
-            Cleaner.querySelector('app-bet-control.double-bet.ng-star-inserted')?.remove()
+        RemoveSecondBetPanel() {
+            this.querySelector('app-bet-control.double-bet.ng-star-inserted')?.remove()
         }
 
-        static RemoveBetCounting() {
-            Cleaner.querySelector('app-active-players-widget')?.remove()
+        RemoveBetCounting() {
+            this.querySelector('app-active-players-widget')?.remove()
         }
 
-        static RemoveOneWinSidebar() {
+        RemoveOneWinSidebar() {
             document.querySelector('.common-layout_sleave-V7jCK.variant-1_sleave-Qr2MW')?.remove()
             document.querySelector('.common-layout_sheet-V7jCK')?.remove()
             document.querySelector('.common-layout_space-V7jCK')?.remove()
         }
 
-        static RemoveOneWinNav() {
+        RemoveOneWinNav() {
             document.querySelector('nav.segment-control_root-ehnrM.segment-control_variant-1-ehnrM')?.remove()
         }
 
-        static RemoveOneWinFooter() {
+        RemoveOneWinFooter() {
             document.querySelector('.footer-container_root-Xk572')?.remove()
         }
 
-        static StartConsoleCleaning() {
-            if (Cleaner.consoleCleanerID) {
-                clearInterval(Cleaner.consoleCleanerID)
+        StartConsoleCleaning() {
+            if (this.consoleCleanerID) {
+                clearInterval(this.consoleCleanerID)
             }
-            Cleaner.consoleCleanerID = setInterval(() => {
+            this.consoleCleanerID = setInterval(() => {
                 console.clear()
                 if (typeof window.gc === 'function') {
                     window.gc()
@@ -70,24 +67,24 @@
             }, 60000)
         }
 
-        static RemoveAirstrip() {
-            Cleaner.querySelector('.play-board-wrapper')?.remove()
+        RemoveAirstrip() {
+            this.querySelector('.play-board-wrapper')?.remove()
         }
 
-        static DisableAnimations() {
+        DisableAnimations() {
             try {
-                const style = Cleaner.contentDocument.createElement('style');
+                const style = this.contentDocument.createElement('style');
                 style.textContent = '* { animation: none !important; transition: none !important; }';
-                Cleaner.contentDocument.head?.appendChild(style);
+                this.contentDocument.head?.appendChild(style);
             } catch (error) {
 
             }
         }
 
-        static querySelector(selector) {
-            return Cleaner.contentDocument.querySelector(selector);
+        querySelector(selector) {
+            return this.contentDocument.querySelector(selector);
         }
     }
 
-    window.Cleaner = Cleaner
+    window.Cleaner = new Cleaner()
 })()

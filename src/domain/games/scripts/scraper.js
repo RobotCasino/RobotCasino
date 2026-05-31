@@ -1,6 +1,6 @@
 (function() {
     class Scraper {
-        static playing(message = null) {
+        playing(message = null) {
             if (message != null) {
                 console.log(`[PLAYING] ${message}`)
             } else {
@@ -8,7 +8,7 @@
             }
         }
 
-        static observing(message = null) {
+        observing(message = null) {
             if (message != null) {
                 console.log(`[OBSERVING] ${message}`)
             } else {
@@ -16,7 +16,7 @@
             }
         }
 
-        static waiting(message = null) {
+        waiting(message = null) {
             if (message != null) {
                 console.log(`[WAITING] ${message}`)
             } else {
@@ -24,18 +24,18 @@
             }
         }
 
-        static log(message) {
+        log(message) {
             console.log(`[LOG] ${message}`)
         }
 
-        static exit() {
+        exit() {
             console.log('[EXIT]')
         }
 
-        static exitWithMessage(message) {
+        exitWithMessage(message) {
             console.log(`[EXIT] ${message}`)
         }
     }
 
-    window.Scraper = Scraper
+    window.Scraper = new Scraper()
 })()

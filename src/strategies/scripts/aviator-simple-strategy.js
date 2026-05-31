@@ -3,25 +3,24 @@
     class Strategy {
 
         constructor() {
-            this.Strategier = window.Strategier
+            this.Provider = window.Provider
 
-            const { success, reason } = this.Strategier.verify()
+            const { success, reason } = this.Provider.verify()
             
             if (!success) {
                 return this.kill(`Strategy verification failed: ${reason}`)
             }
 
-            this.Scraper = window.Scraper
-            this.Playground = window.Playground
-            this.Util = window.Util
+            this.Scraper = this.Provider.Scraper
+            this.Playground = this.Provider.Playground
+            this.Util = this.Provider.Util
+
+            this.Scraper.log('Strategy initialized successfully')
         }
 
         start() {
-            this.Util.observe('.payouts-block', (node, mutation) => {
-                window.Scraper.log(JSON.stringify(mutation))
-                window.Scraper.log(JSON.stringify(node))
-
-                window.Scraper.exitWithMessage('Payouts block changed')
+            this.Util.observe(this.Playground.payoutsBlock, (node, mutation) => {
+                window.Scraper.log(`New payout: ${node.textContent}`)
             })
         }
 
@@ -35,9 +34,11 @@
             return this.Scraper.exit()
         }
 
-    }
+    }   
 
     const strategy = new Strategy()
+
+    window.Strategy = strategy
 
     strategy.start()
 })();

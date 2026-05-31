@@ -7,20 +7,16 @@
                 CRASHED: 'crashed',
             })
 
-            window.Cleaner.Init()
-
             this.iframe = document.evaluate("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
             this.contentDocument = this.iframe ? this.iframe.contentDocument : document;
+
+            this.payoutsBlock = this.querySelector('.payouts-block')
         
             this.config(1.8)
         }
 
         bet() {
             this.querySelector('btn btn-success')
-        }
-
-        setAmount(amount) {
-
         }
 
         config(autoCashout) {

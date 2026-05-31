@@ -10,7 +10,7 @@ class Strategy(ABC):
 
     def __init__(self, playing_scripts: tuple[Script, ...] | tuple[()] = tuple()):
         verification_scripts: tuple[Script, ...] = (
-            Script("Strategier", f"{BASE_DIR}/domain/strategies/scripts/strategier.js"),
+            Script("Provider", f"{BASE_DIR}/domain/strategies/scripts/provider.js"),
         )
        
         self._playing_scripts = verification_scripts + playing_scripts

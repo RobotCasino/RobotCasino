@@ -11,6 +11,10 @@ class Navigator(ABC):
     async def close(self) -> None:
         pass
 
+    @abstractmethod
+    def is_optimized_for_low_memory(self) -> bool:
+        pass
+
     async def get_memory_usage_bytes(self) -> int | None:
         return None
 

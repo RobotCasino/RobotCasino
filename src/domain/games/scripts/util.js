@@ -1,8 +1,6 @@
 (function() {
     class Util {
-        static observe(target, callback) {
-            const element = document.querySelector(target)
-
+        observe(element, callback) {
             if (!element) {
                 return null
             }
@@ -26,5 +24,5 @@
         }
     }
 
-    window.Util = Util
+    window.Util = new Util()
 })()

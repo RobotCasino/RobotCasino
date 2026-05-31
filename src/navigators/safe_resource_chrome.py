@@ -122,5 +122,8 @@ class SafeResourceChrome(Navigator):
             return
         
         await self.__navigator.close()
+    
+    def is_optimized_for_low_memory(self) -> bool:
+        return True
 
 __ALL__ = ['SafeResourceChrome']
