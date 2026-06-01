@@ -12,8 +12,9 @@ if TYPE_CHECKING:
     from src.web.tab import Tab
 
 class Game(ABC):
-    def __init__(self, name: str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple(), domain_scripts: tuple['Script', ...] | tuple[()] = tuple()):
+    def __init__(self, name: str, display_name:str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple(), domain_scripts: tuple['Script', ...] | tuple[()] = tuple()):
         self.__name = name
+        self.__display_name = display_name
         self.__url = url
 
         self.__strategy: Strategy | None = None
@@ -42,6 +43,9 @@ class Game(ABC):
 
     def get_strategy(self):
         return self.__strategy
+    
+    def get_display_name(self):
+        return self.__display_name
     
     def get_casino_or_fail(self) -> Casino:
         if self.__casino is None:

@@ -54,3 +54,17 @@ def stop():
     sender.send({
         "cmd": "stop",
     })
+
+@App.command(
+    context_settings={"allow_extra_args": False, "ignore_unknown_options": True},
+    short_help="Get the current status of the scraper."
+)
+def status():
+    sender = Sender(SOCKET_PATH)
+
+    res = sender.send({
+        "cmd": "status",
+    })
+
+    if res is not None:
+        rich.print(res.get("result"))

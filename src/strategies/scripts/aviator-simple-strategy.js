@@ -1,7 +1,6 @@
 (function () 
 {
     class Strategy {
-
         constructor() {
             this.Provider = window.Provider
 

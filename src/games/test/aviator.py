@@ -6,6 +6,7 @@ from src.web.tab import Tab
 class Aviator(Game):
     def __init__(self):
         name = "aviator"
+        display_name = "Aviator"
         url = "https://testcasino.com"
 
         playing_scripts: tuple[Script, ...] = (
@@ -17,7 +18,7 @@ class Aviator(Game):
             Script('Domain Game Script', f'{BASE_DIR}/domain/games/scripts/aviator.js'),
         )
 
-        super().__init__(name, url, playing_scripts, game_domain_scripts)
+        super().__init__(name, display_name, url, playing_scripts, game_domain_scripts)
 
     async def play(self, tab: Tab):
         strategy = self.get_strategy_or_fail()

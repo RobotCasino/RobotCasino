@@ -6,13 +6,17 @@ from src.domain.scripts.script import Script
 class Dino(Game):
 
     def __init__(self):
+        name = "dino"
+        display_name = "Dino"
+        url = "https://m.mystake.com/es/casino/gamepage?gameid=12489"
+
         playing_scripts: tuple[Script, ...] = (
         )
 
         game_domain_scripts: tuple[Script, ...] = (
         )
 
-        super().__init__("Dino", "https://m.mystake.com/es/casino/gamepage?gameid=12489", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
+        super().__init__(name, display_name, url, playing_scripts, game_domain_scripts)
 
     async def play(self, tab: Tab):
         casino = self.get_casino_or_fail()

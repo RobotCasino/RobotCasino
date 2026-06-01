@@ -16,7 +16,7 @@ class Aviator(Game):
             Script('Domain Game Script', f'{BASE_DIR}/domain/games/scripts/aviator.js'),
         )
 
-        super().__init__("Aviator", "https://1win.com/casino/play/v_spribe:aviator", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
+        super().__init__("aviator", "Aviator", "https://1win.com/casino/play/v_spribe:aviator", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
 
     async def play(self, tab: Tab):
         casino = self.get_casino_or_fail()

@@ -23,12 +23,12 @@ from src.utils.browser_console import BrowserConsole
 class Scraper:
 
     class States(Enum):
-        INITIALIZING = "initializing"
-        READY = "ready"
-        PLAYING = "playing"
-        WAITING = "waiting"
-        RELOADING = "reloading"
-        OBSERVING = "observing"
+        INITIALIZING = "Initializing"
+        READY = "Ready"
+        PLAYING = "Playing"
+        WAITING = "Waiting"
+        RELOADING = "Reloading"
+        OBSERVING = "Observing"
 
     def __init__(self, browser: str, casino: str , game: str, strategy: str, extra_params: dict[str, str] = {}) -> None:
         Logger.info(f"Starting scraper with browser={browser}, casino={casino}, game={game}, strategy={strategy}")
@@ -41,6 +41,8 @@ class Scraper:
         self.__active_tab: Tab | None = None
 
         self.__state = Scraper.States.INITIALIZING
+
+        self.__scraper_information: dict[str, str] = {}
 
         Metadata.set_dictionary(extra_params)
 
@@ -95,6 +97,12 @@ class Scraper:
         await casino.prepare_before_playing(tab)
         await strategy.prepare_before_playing(tab)
 
+        self.__set_scraper_information({
+            'game': game.get_display_name(),
+            'casino': casino.get_display_name(),
+            'strategy': strategy.get_display_name(),
+        })
+
         while True:
             await game.play(tab)
 
@@ -129,11 +137,24 @@ class Scraper:
         return f":camera: Screenshot saved to {path}"
     
     def status(self) -> str:
+        info = self.__scraper_information
+
+        info['status'] = self.__state.value
+
         lines: list[str] = []
         lines.append("╭─ Scraper Status ─╮")
-        lines.append(f"  Game:     Test")
-        lines.append(f"  URL:      Test")
-        lines.append(f"  Strategy: Test")
+
+        if info:
+            # Human-friendly labels and aligned columns
+            labels = [k.replace('_', ' ').title() for k in info.keys()]
+            max_label_len = max((len(l) for l in labels), default=0)
+
+            for key, label in zip(info.keys(), labels):
+                value = info.get(key, "")
+                lines.append(f"  {label:<{max_label_len}} : {value}")
+        else:
+            lines.append("  (no scraper information available)")
+
         lines.append("╰───────────────────╯")
         return "\n".join(lines)
     
@@ -167,5 +188,15 @@ class Scraper:
 
     async def __is_scraper_waiting(self) -> bool:
         return self.__state is self.States.WAITING
+
+    def __set_scraper_information(self, info: dict[str, str]) -> None:
+        if 'game' in info:
+            self.__scraper_information['game'] = info['game']
+        
+        if 'casino' in info:
+            self.__scraper_information['casino'] = info['casino']
+        
+        if 'strategy' in info:
+            self.__scraper_information['strategy'] = info['strategy']
 
 __ALL__ = ["Scraper"]

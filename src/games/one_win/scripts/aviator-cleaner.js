@@ -14,6 +14,7 @@
             this.DisableAnimations()
             this.RemoveAirstrip()
             this.RemoveBetCounting()
+            
             this.RemoveOneWinSidebar()
             this.RemoveOneWinNav()
             this.RemoveOneWinFooter()
@@ -28,8 +29,14 @@
         RemoveChat() {
             this.querySelector('.chat-bar.ng-star-inserted')?.remove()
             const gamePlay = this.querySelector('.game-play');
+            const mainContaier = this.querySelector('.main-container');
+
             if (gamePlay) {
                 gamePlay.style.setProperty('width', '100%', 'important');
+            }
+
+            if (mainContaier) {
+                mainContaier.style.setProperty('width', '100%', 'important');
             }
         }
 

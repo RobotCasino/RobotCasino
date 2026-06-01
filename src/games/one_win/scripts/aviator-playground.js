@@ -16,11 +16,12 @@
         }
 
         bet() {
-            this.querySelector('btn btn-success')
+            this.querySelector('.btn.btn-success.bet.ng-star-inserted')?.click()
         }
 
         config(autoCashout) {
             const autoTab = this.querySelectorAsxPath("//button[contains(@class,'tab') and contains(text(),'Auto')]")
+            
             if (autoTab) autoTab.click()
         }
 

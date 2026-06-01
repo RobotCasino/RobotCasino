@@ -1,5 +1,5 @@
-from src.strategies.aviator.simple_strategy import SimpleStrategy as AviatorSimpleStrategy
-from src.strategies.dino.simple_strategy import SimpleStrategy as DinoSimpleStrategy
+from strategies.aviator.aviator_simple_strategy import AviatorSimpleStrategy
+from strategies.dino.dino_simple_strategy import DinoSimpleStrategy
 
 from enum import Enum
 
