@@ -8,7 +8,7 @@ from src.infrastructure.config import OUTPUT_DIR, SOCKET_PATH
 from src.infrastructure.ipc.sender import Sender
 from src.infrastructure.process.socket_server import SocketServer
 from src.infrastructure.process.foreground import ForegroundProcess
-from src.utils.args_parser import ArgsParser
+from common.utils.args_parser import ArgsParser
 
 App = Typer(add_completion=False)
 

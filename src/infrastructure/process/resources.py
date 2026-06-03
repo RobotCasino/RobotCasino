@@ -1,8 +1,8 @@
 
-from src.utils.file_reader import FileReader
+from common.utils.file_reader import FileReader
 from os import getenv
 
-from src.utils.metadata import Metadata
+from common.utils.metadata import Metadata
 
 class Resources:
 

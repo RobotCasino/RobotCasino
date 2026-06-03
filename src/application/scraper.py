@@ -1,24 +1,18 @@
-from enum import Enum
 import json
-
+from enum import Enum
 from asyncio import StreamReader, StreamWriter
-
 from src.infrastructure.process.resources import Resources
-
 from src.infrastructure.logging.logger import Logger
 from src.infrastructure.ipc.receiver import Receiver
 from src.infrastructure.process.foreground import ForegroundProcess
-
-from src.web.tab import Tab
-from src.web.browser import Browser
-
-from src.navigators.navigators import Navigators
-from src.games.games import Games
-from src.casinos.casinos import Casinos
-from src.strategies.strategies import Strategies
-
-from src.utils.metadata import Metadata
-from src.utils.browser_console import BrowserConsole
+from src.data.web.tab import Tab
+from src.data.web.browser import Browser
+from src.data.navigators.navigators import Navigators
+from src.data.games.games import Games
+from src.data.casinos.casinos import Casinos
+from src.data.strategies.strategies import Strategies
+from src.common.utils.metadata import Metadata
+from src.common.utils.browser_console import BrowserConsole
 
 class Scraper:
 
