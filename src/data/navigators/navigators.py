@@ -2,7 +2,7 @@ from enum import Enum
 
 from data.navigators.safe_resource_chrome import SafeResourceChrome
 from data.navigators.no_constraints_chrome import NoConstraintsChrome
-from data.navigators.navigator import Navigator
+from core.domain.navigators.navigator import Navigator
 
 class Navigators(Enum):
     NO_CONSTRAINTS_CHROME = NoConstraintsChrome()

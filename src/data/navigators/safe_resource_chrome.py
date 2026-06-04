@@ -3,7 +3,7 @@ from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
 from os import getenv
 
-from data.navigators.navigator import Navigator
+from src.core.domain.navigators.navigator import Navigator
 
 class SafeResourceChrome(Navigator):
     def __init__(self):

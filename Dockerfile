@@ -8,18 +8,16 @@ RUN apk update && apk add --no-cache \
     ttf-freefont \
     && rm -rf /var/cache/apk/*
 
-WORKDIR /app/output
+WORKDIR /app/
 
 ENV PYTHONUNBUFFERED=1
 ENV HEADLESS=1
 
 ENV CHROME_BINARY_PATH=/usr/bin/chromium-browser
 
-COPY . /app/
+COPY . .
 
 RUN pip install --no-cache-dir /app/
-
-VOLUME /app/output
 
 ENTRYPOINT ["robotcasino"]
 CMD ["run"]

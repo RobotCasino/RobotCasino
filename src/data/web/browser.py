@@ -1,7 +1,7 @@
 
 from data.web.tab import Tab
 
-from data.navigators.navigator import Navigator
+from core.domain.navigators.navigator import Navigator
 
 class Browser:
     def __init__(self, navigator: Navigator) -> None:

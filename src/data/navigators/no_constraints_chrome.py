@@ -3,7 +3,7 @@ from pydoll.browser import Chrome
 from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
 
-from data.navigators.navigator import Navigator
+from core.domain.navigators.navigator import Navigator
 
 class NoConstraintsChrome(Navigator):
     def __init__(self):

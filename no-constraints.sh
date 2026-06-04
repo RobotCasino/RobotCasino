@@ -4,7 +4,8 @@ docker container stop robotcasino
 docker container rm robotcasino
 docker build . -t robotcasino:latest
 docker run --name robotcasino -d \
- -v ./app/output:/app/output \
+ -v ./output:/tmp/robotcasino/screenshots \
+ -v ./output:/var/log/robotcasino/ \
  -e DISPLAY=host.docker.internal:0 \
  -e HEADLESS=0 \
  robotcasino run \
