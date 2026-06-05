@@ -18,13 +18,14 @@ dependencies = [
 ]
 
 [project.scripts]
-robotcasino = "src.__main__:main"
+robotcasino = "application.main:main"
 
 [tool.setuptools.package-data]
-src = ["domain/**/*.json", "domain/**/*.js", "casinos/**/*.js", "games/**/*.js", "strategies/**/*.js"]
+application = ["core/**/*.json", "core/**/*.js", "data/**/*.js", "data/**/*.json"]
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["application*", "infrastructure*", "common*", "core*", "data*"]
 
 [dependency-groups]
 dev = [

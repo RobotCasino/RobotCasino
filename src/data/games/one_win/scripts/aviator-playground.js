@@ -1,6 +1,6 @@
 (function () {
-    class AviatorPlayground {
-        constructor() {
+    class Playground {
+        load() {
             this.STATES = Object.freeze({
                 WAITING: 'waiting',
                 BET_PLACED: 'bet_placed',
@@ -34,5 +34,5 @@
         }
     }
 
-    window.Playground = new AviatorPlayground()
+    window.Playground = new Playground()
 })()

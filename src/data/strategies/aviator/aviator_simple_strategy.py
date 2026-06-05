@@ -1,13 +1,13 @@
 from core.domain.strategies.strategy import Strategy
 from core.domain.scripts.script import Script
-from src.infrastructure.config import BASE_DIR
+from common.constants.directories import BASE_DIR
 from data.web.tab import Tab
 
 class AviatorSimpleStrategy(Strategy):
 
     def __init__(self):
         playing_scripts: tuple[Script, ...] = (
-            Script('Simple Strategy',  f'{BASE_DIR}/strategies/scripts/aviator-simple-strategy.js'),
+            Script('Simple Strategy',  f'{BASE_DIR}data/strategies/scripts/aviator-simple-strategy.js'),
         )
 
         super().__init__("aviator_simple_strategy", "Aviator Simple Strategy", playing_scripts)

@@ -1,21 +1,21 @@
 (function() {
-    class Aviator {
-        static isBlue(multiplier) {
+    class Domain {
+        isBlue(multiplier) {
             return multiplier >= 1 && multiplier < 2
         }
 
-        static isPurple(multiplier) {
+        isPurple(multiplier) {
             return multiplier >= 2 && multiplier < 10
         }
 
-        static isPink(multiplier) {
+        isPink(multiplier) {
             return multiplier >= 10
         }
 
-        static getResult(multiplier, autoWithdrawal) {
+        getResult(multiplier, autoWithdrawal) {
             return multiplier < autoWithdrawal ? 'LOST' : 'WON'
         }
     }
 
-    window.Aviator = Aviator;
+    window.Domain = new Domain();
 })()

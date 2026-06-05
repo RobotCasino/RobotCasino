@@ -1,14 +1,14 @@
+import rich
 from datetime import datetime
 
-import rich
-
 from typer import Typer, Context
-from src.application.scraper import Scraper
-from src.infrastructure.config import OUTPUT_DIR, SOCKET_PATH
-from src.infrastructure.ipc.sender import Sender
-from src.infrastructure.process.socket_server import SocketServer
-from src.infrastructure.process.foreground import ForegroundProcess
+from application.scraper import Scraper
+from infrastructure.ipc.sender import Sender
+from infrastructure.process.socket_server import SocketServer
+from infrastructure.process.foreground import ForegroundProcess
 from common.utils.args_parser import ArgsParser
+
+from common.constants.directories import DOWNLOAD_DIR
 
 App = Typer(add_completion=False)
 
@@ -31,14 +31,12 @@ def run(ctx: Context, browser: str, casino: str, game: str, strategy: str):
     context_settings={"allow_extra_args": False, "ignore_unknown_options": True},
     short_help="Take a screenshot and save it to the path."
 )
-def screenshot(path: str | None = None):
-    path = path or datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
-    
-    sender = Sender(SOCKET_PATH)
+def screenshot(filename: str | None = None):
+    path = filename or datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
 
-    res = sender.send({
+    res = Sender.send({
         "cmd": "screenshot",
-        "arguments": f"{OUTPUT_DIR / path}",
+        "arguments": f"{DOWNLOAD_DIR}{path}",
     })
 
     if res is not None:
@@ -49,9 +47,7 @@ def screenshot(path: str | None = None):
     short_help="Stop the scraper and exit."
 )
 def stop():
-    sender = Sender(SOCKET_PATH)
-
-    sender.send({
+    Sender.send({
         "cmd": "stop",
     })
 
@@ -60,9 +56,7 @@ def stop():
     short_help="Get the current status of the scraper."
 )
 def status():
-    sender = Sender(SOCKET_PATH)
-
-    res = sender.send({
+    res = Sender.send({
         "cmd": "status",
     })
 

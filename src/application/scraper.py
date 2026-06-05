@@ -1,18 +1,18 @@
 import json
 from enum import Enum
 from asyncio import StreamReader, StreamWriter
-from src.infrastructure.process.resources import Resources
-from src.infrastructure.logging.logger import Logger
-from src.infrastructure.ipc.receiver import Receiver
-from src.infrastructure.process.foreground import ForegroundProcess
-from src.data.web.tab import Tab
-from src.data.web.browser import Browser
-from src.data.navigators.navigators import Navigators
-from src.data.games.games import Games
-from src.data.casinos.casinos import Casinos
-from src.data.strategies.strategies import Strategies
-from src.common.utils.metadata import Metadata
-from src.common.utils.browser_console import BrowserConsole
+from infrastructure.process.resources import Resources
+from infrastructure.logging.logger import Logger
+from infrastructure.ipc.receiver import Receiver
+from infrastructure.process.foreground import ForegroundProcess
+from data.web.tab import Tab
+from data.web.browser import Browser
+from data.navigators.navigators import Navigators
+from data.games.games import Games
+from data.casinos.casinos import Casinos
+from data.strategies.strategies import Strategies
+from common.utils.metadata import Metadata
+from common.utils.browser_console import BrowserConsole
 
 class Scraper:
 
@@ -182,6 +182,12 @@ class Scraper:
 
     async def __is_scraper_waiting(self) -> bool:
         return self.__state is self.States.WAITING
+
+    async def __is_scraper_playing(self) -> bool:
+        return self.__state is self.States.PLAYING
+    
+    async def __is_scraper_observing(self) -> bool:
+        return self.__state is self.States.OBSERVING
 
     def __set_scraper_information(self, info: dict[str, str]) -> None:
         if 'game' in info:

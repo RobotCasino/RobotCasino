@@ -13,6 +13,13 @@
             this.Scraper = this.Provider.Scraper
             this.Playground = this.Provider.Playground
             this.Util = this.Provider.Util
+            this.GameCleaner = this.Provider.GameCleaner
+            this.CasinoCleaner = this.Provider.CasinoCleaner
+
+            this.GameCleaner.start()
+            this.CasinoCleaner.start()
+
+            this.Playground.load()
 
             this.Scraper.log('Strategy initialized successfully')
         }

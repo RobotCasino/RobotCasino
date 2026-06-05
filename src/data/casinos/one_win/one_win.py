@@ -1,8 +1,9 @@
-from src.core.domain.scripts.script import Script
-from src.data.navigators.cookie import Cookie
-from src.core.domain.casinos.casino import Casino
-from src.data.web.tab import Tab
+from common.constants.directories import BASE_DIR
+from core.domain.scripts.script import Script
+from data.navigators.cookie import Cookie
+from core.domain.casinos.casino import Casino
 from common.utils.metadata import Metadata
+from data.web.tab import Tab
 from time import time
 
 class OneWin(Casino):
@@ -13,7 +14,9 @@ class OneWin(Casino):
         url = 'https://1win.com/'
         domain = '1win.com'
 
-        playing_scripts: tuple[Script, ...] | tuple[()] = tuple()
+        playing_scripts: tuple[Script, ...] = (
+            Script("1Win Playing Script", f'{BASE_DIR}data/casinos/one_win/scripts/one-win-cleaner.js'),
+        )
 
         super().__init__(name, url, display_name, domain, playing_scripts)
 

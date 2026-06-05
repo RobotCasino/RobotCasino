@@ -1,12 +1,9 @@
-import os
-from pathlib import Path
-
 import signal
 import asyncio
 
-from os import getpid
+from os import getpid, path, remove, _exit
 
-from src.infrastructure.config import PID_PATH, SOCKET_PATH
+from common.constants.directories import TMP_DIR
 
 from typing import Callable, Coroutine, Any
 
@@ -16,12 +13,15 @@ class ForegroundProcess:
         self.close_callback = close_callback
         self._loop = None
 
-        self.pidpath = Path(PID_PATH)
-        self.socketpath = Path(SOCKET_PATH)
+        self.pidFilePath = TMP_DIR + "process.pid"
+        self.socketFilePath = TMP_DIR + ".robotcasino.socket"
 
     def start(self):
-        self.pidpath.parent.mkdir(parents=True, exist_ok=True)
-        self.pidpath.write_text(str(getpid()))
+        if path.isdir(TMP_DIR) is False:
+            raise Exception(f"A problem occured with the tmp directory path: {TMP_DIR}")
+        
+        with open(self.pidFilePath, "w") as f:
+            f.write(str(getpid()))
 
         signal.signal(signal.SIGINT, self._handle_terminate) # pyright: ignore
         signal.signal(signal.SIGTERM, self._handle_terminate) # pyright: ignore
@@ -48,12 +48,14 @@ class ForegroundProcess:
         raise SystemExit(0)
 
     def _cleanup(self):
-        self.socketpath.unlink(missing_ok=True)
-        self.pidpath.unlink(missing_ok=True)
+        if path.isfile(self.socketFilePath):
+            remove(self.socketFilePath)
+        if path.isfile(self.pidFilePath):
+            remove(self.pidFilePath)
 
     @staticmethod
     def is_running() -> bool:
-        return Path(PID_PATH).is_file()
+        return path.isfile(TMP_DIR + "process.pid")
 
     @staticmethod
     def kill(close_callback: Callable[[], Coroutine[Any, Any, Any] | Any] | None = None):
@@ -65,9 +67,14 @@ class ForegroundProcess:
                     await close_callback()
                 else:
                     close_callback()
-            Path(SOCKET_PATH).unlink(missing_ok=True)
-            Path(PID_PATH).unlink(missing_ok=True)
-            os._exit(0)
+            
+            if path.isfile(TMP_DIR + ".robotcasino.socket"):
+                remove(TMP_DIR + ".robotcasino.socket")
+
+            if path.isfile(TMP_DIR + "process.pid"):
+                remove(TMP_DIR + "process.pid")
+            
+            _exit(0)
             
         asyncio.create_task(shutdown())
 

@@ -1,8 +1,8 @@
 
 from common.utils.file_reader import FileReader
-from os import getenv
-
 from common.utils.metadata import Metadata
+
+from os import getenv
 
 class Resources:
 
@@ -18,10 +18,15 @@ class Resources:
 
         if memory_usage is None or memory_limit is None:
             return False
-
-        memory_ratio = float(getenv("MEMORY_RELOAD_RATIO", "0.95"))
         
-        return memory_usage >= int(memory_limit * memory_ratio)
+        memory_ratio = getenv("MEMORY_RELOAD_RATIO")
+
+        memory_ratio_as_float = float(memory_ratio) if memory_ratio is not None else None
+
+        if memory_ratio_as_float is None:
+            raise ValueError("Invalid MEMORY_RELOAD_RATIO environment variable")
+        
+        return memory_usage >= int(memory_limit * memory_ratio_as_float)
     
     @staticmethod
     def bytes_to_mb(value: int) -> int:
@@ -41,8 +46,8 @@ class Resources:
         if Resources.__memory_limit_as_bytes is not None:
             return Resources.__memory_limit_as_bytes
 
-        memory_limit_env = Metadata.get("MEMORY_LIMIT")
-        
+        memory_limit_env = getenv("MEMORY_LIMIT_MB")
+
         if memory_limit_env is not None:
             return int(memory_limit_env) * 1024 * 1024
 

@@ -1,18 +1,17 @@
+from collections.abc import Callable
+
 from pydoll.browser.tab import Tab as PydollTab
 from pydoll.protocol.runtime.events import RuntimeEvent
 from pydoll.protocol.fetch.events import FetchEvent
 from pydoll.protocol.fetch.types import RequestStage
 from pydoll.constants import By
 from pydoll.protocol.network.types import ResourceType, ErrorReason
-from asyncio import sleep
-
-from collections.abc import Callable
 
 from data.navigators.cookie import Cookie
-
 from data.web.element import Element
-
 from core.domain.scripts.script import Script
+
+from asyncio import sleep
 
 class Tab:
     def __init__(self, tab: PydollTab) -> None:
@@ -88,7 +87,7 @@ class Tab:
         return None
 
     async def find_element_by_xpath_or_fail(self, xpath: str) -> Element:
-        web_element = await self.__page.find_or_wait_element(By.XPATH, xpath, timeout=60)
+        web_element = await self.__page.find_or_wait_element(By.XPATH, xpath, timeout=120, raise_exc=False)
         if web_element:
             return Element(web_element)
         

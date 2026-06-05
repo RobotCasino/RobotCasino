@@ -1,4 +1,4 @@
-from src.infrastructure.config import BASE_DIR
+from common.constants.directories import BASE_DIR
 from core.domain.games.game import Game
 from data.web.tab import Tab
 from core.domain.scripts.script import Script

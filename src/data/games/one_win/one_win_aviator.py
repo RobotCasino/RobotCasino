@@ -1,19 +1,20 @@
-from src.infrastructure.config import BASE_DIR
+import asyncio
+
+from common.constants.directories import BASE_DIR
 from core.domain.games.game import Game
 from data.web.tab import Tab
-from data.web.element import Element
 from core.domain.scripts.script import Script
 
-class Aviator(Game):
+class OneWinAviator(Game):
 
     def __init__(self):
         playing_scripts: tuple[Script, ...] = (
-            Script("Cleaner Script", f"{BASE_DIR}/games/one_win/scripts/aviator-cleaner.js"),
-            Script("Playground Script", f"{BASE_DIR}/games/one_win/scripts/aviator-playground.js"),
+            Script("Game Cleaner Script", f"{BASE_DIR}core/domain/games/scripts/aviator-cleaner.js"),
+            Script("Playground Script", f"{BASE_DIR}data/games/one_win/scripts/aviator-playground.js"),
         )
 
         game_domain_scripts: tuple[Script, ...] = (
-            Script('Domain Game Script', f'{BASE_DIR}/domain/games/scripts/aviator.js'),
+            Script('Domain Game Script', f'{BASE_DIR}core/domain/games/scripts/aviator-domain.js'),
         )
 
         super().__init__("aviator", "Aviator", "https://1win.com/casino/play/v_spribe:aviator", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
@@ -26,12 +27,13 @@ class Aviator(Game):
     
         await tab.reload()
 
-        await tab.sleep(5)
-
-        await self.set_game_balance_currency(tab)
-        await self.wait_for_aviator_iframe_to_load(tab)
-
         await tab.sleep(2)
+
+        async with asyncio.TaskGroup() as tg:
+           tg.create_task(self.set_game_balance_currency(tab))
+           tg.create_task(self.wait_for_aviator_iframe_to_load(tab))
+
+        await tab.sleep(10)
 
         await self.load_scripts_to_tab_when_playing(tab)
         await casino.load_scripts_to_tab_when_playing(tab)
@@ -54,10 +56,9 @@ class Aviator(Game):
 
         await play_button.click_by_cdp()
 
-        await tab.sleep(2)
-
     async def wait_for_aviator_iframe_to_load(self, tab: Tab) -> None:
         iframe = await tab.find_element_by_xpath_or_fail("//iframe[contains(@src, 'spribelaunch.com/aviator')]")
-        await iframe.find_element_by_xpath_or_fail("//div[@class = 'game-logo']")
+        await iframe.find_element_by_css_selector_or_fail("app-bet-control")
 
-__ALL__ = ['Aviator']
+
+__ALL__ = ['OneWinAviator']

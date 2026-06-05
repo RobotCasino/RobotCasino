@@ -1,6 +1,7 @@
-FROM python:3.11-alpine
+FROM python:3.14-alpine
 
 RUN addgroup -S jhongroup && adduser -S jhon -G jhongroup
+RUN mkdir -p /home/jhon/Downloads/ /home/jhon/Downloads/robotcasino/ /home/jhon/.cache/robotcasino/logs/ /tmp/robotcasino/ 
 
 RUN apk update && apk add --no-cache \
     chromium \
@@ -12,15 +13,16 @@ RUN apk update && apk add --no-cache \
 
 WORKDIR /app
 
-COPY . .
+COPY ./src/ .
 
-RUN pip install --no-cache-dir /app/
+RUN pip install --no-cache-dir /app
 
-RUN chown -R jhon:jhongroup /app
+RUN chown -R jhon:jhongroup /app && \
+    chown -R jhon:jhongroup /home/jhon/Downloads/robotcasino/ && \
+    chown -R jhon:jhongroup /home/jhon/.cache/robotcasino/logs/ && \
+    chown -R jhon:jhongroup /tmp/robotcasino/
 
 ENV PYTHONUNBUFFERED=1
-ENV HEADLESS=1
-ENV CHROME_BINARY_PATH=/usr/bin/chromium-browser
 
 USER jhon
 

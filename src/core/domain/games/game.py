@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING
 
-from src.core.domain.strategies.strategy import Strategy
-from src.core.domain.casinos.casino import Casino
-from src.infrastructure.config import BASE_DIR
-from src.core.domain.scripts.script import Script
+from core.domain.strategies.strategy import Strategy
+from core.domain.casinos.casino import Casino
+from common.constants.directories import BASE_DIR
+from core.domain.scripts.script import Script
 
 if TYPE_CHECKING:
-    from src.data.web.tab import Tab
+    from data.web.tab import Tab
 
 class Game(ABC):
     def __init__(self, name: str, display_name:str, url: str, playing_scripts: tuple['Script', ...] | tuple[()] = tuple(), domain_scripts: tuple['Script', ...] | tuple[()] = tuple()):
@@ -23,8 +23,8 @@ class Game(ABC):
         self._domain_scripts = domain_scripts 
 
         self.__util_scripts: tuple['Script', ...] = (
-            Script('Util Script', f'{BASE_DIR}/domain/games/scripts/util.js'),
-            Script('Scraper Util Script', f'{BASE_DIR}/domain/games/scripts/scraper.js'),
+            Script('Util Script', f'{BASE_DIR}core/domain/games/scripts/util.js'),
+            Script('Scraper Util Script', f'{BASE_DIR}core/domain/games/scripts/scraper.js'),
         )
 
     @abstractmethod

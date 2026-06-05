@@ -1,7 +1,7 @@
 from enum import Enum
 
 from core.domain.games.game import Game
-from data.games.one_win.aviator import Aviator as OneWinAviator
+from data.games.one_win.one_win_aviator import OneWinAviator
 from data.games.test.aviator import Aviator as TestAviator
 from data.games.mystake.dino import Dino as MystakeDino
 

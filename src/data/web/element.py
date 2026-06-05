@@ -1,6 +1,6 @@
 from pydoll.constants import By
 from pydoll.elements.web_element import WebElement as PydollWebElement
-from src.core.domain.scripts.script import Script
+from core.domain.scripts.script import Script
 
 class Element: 
     def __init__(self, web_element: PydollWebElement | list[PydollWebElement]):
@@ -95,7 +95,7 @@ class Element:
             web_elements = []
             for element in self.__web_element:
                 try:
-                    web_element = await element.find_or_wait_element(By.XPATH, xpath, timeout=60)
+                    web_element = await element.find_or_wait_element(By.XPATH, xpath, timeout=120)
                     if web_element:
                         web_elements.append(web_element)
                 except Exception:
@@ -103,7 +103,7 @@ class Element:
             if web_elements:
                 return Element(web_elements)
         else:
-            web_element = await self.__web_element.find_or_wait_element(By.XPATH, xpath, timeout=60)
+            web_element = await self.__web_element.find_or_wait_element(By.XPATH, xpath, timeout=120)
             if web_element:
                 return Element(web_element)
         

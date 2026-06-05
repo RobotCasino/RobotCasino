@@ -1,6 +1,5 @@
 from typing import Optional, Literal
 
-
 class Cookie:
     def __init__(self) -> None:
         self._name: Optional[str] = None

@@ -7,6 +7,8 @@ docker run --name robotcasino -d \
  -v ./app/output:/app/output \
  -e DISPLAY=host.docker.internal:0 \
  -e HEADLESS=1 \
+ -e MEMORY_LIMIT_MB=700 \
+ -e MEMORY_RELOAD_RATIO=0.95 \
  --memory-swap 800mb \
  -m 800mb \
  --shm-size=2gb \

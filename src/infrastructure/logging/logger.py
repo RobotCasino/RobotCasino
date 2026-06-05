@@ -6,7 +6,10 @@ from typing import Optional
 
 MAX_LOG_SIZE = 1 * 1024 * 1024  # 1 MB
 
-from src.infrastructure.config import CONSOLE_LOG_PATH, ERROR_LOG_PATH
+from common.constants.directories import LOG_DIR
+
+CONSOLE_LOG_FILE = LOG_DIR + "messages.log"
+ERROR_LOG_FILE = LOG_DIR + "errors.log"
 
 # Configure the root logger for stdout/stderr output
 _stream_formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
@@ -47,8 +50,8 @@ class Logger:
         log_entry = f"[{timestamp}] [{level}] {message}\n"
 
         # Rotate log if needed, then write
-        Logger._rotate_log_if_needed(CONSOLE_LOG_PATH)
-        with open(CONSOLE_LOG_PATH, "a", encoding="utf-8") as f:
+        Logger._rotate_log_if_needed(CONSOLE_LOG_FILE)
+        with open(CONSOLE_LOG_FILE, "a", encoding="utf-8") as f:
             f.write(log_entry)
 
         # Write to stdout via logging
@@ -66,8 +69,8 @@ class Logger:
             log_entry += f"Traceback:\n{tb}\n"
 
         # Rotate log if needed, then write
-        Logger._rotate_log_if_needed(ERROR_LOG_PATH)
-        with open(ERROR_LOG_PATH, "a", encoding="utf-8") as f:
+        Logger._rotate_log_if_needed(ERROR_LOG_FILE)
+        with open(ERROR_LOG_FILE, "a", encoding="utf-8") as f:
             f.write(log_entry)
 
         # Write to stderr via logging

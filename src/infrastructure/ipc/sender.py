@@ -2,14 +2,15 @@ import json
 from socket import AF_UNIX, SOCK_STREAM, socket
 from typing import Optional
 
+from common.constants.directories import TMP_DIR
+
 class Sender:
+    __SOCKET_PATH = TMP_DIR + ".robotcasino.socket"
 
-    def __init__(self, socketPath: str):
-        self.__socketPath = socketPath
-
-    def send(self, message: dict[str, str]) -> Optional[dict[str, str]]:
+    @staticmethod
+    def send(message: dict[str, str]) -> Optional[dict[str, str]]:
         with socket(AF_UNIX, SOCK_STREAM) as client:
-            client.connect(self.__socketPath)
+            client.connect(Sender.__SOCKET_PATH)
             client.sendall((json.dumps(message) + "\n").encode())
 
             data = b""

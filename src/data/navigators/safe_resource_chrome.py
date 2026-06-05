@@ -3,16 +3,13 @@ from pydoll.browser.options import ChromiumOptions
 from pydoll.browser.tab import Tab as PydollTab
 from os import getenv
 
-from src.core.domain.navigators.navigator import Navigator
+from core.domain.navigators.navigator import Navigator
 
 class SafeResourceChrome(Navigator):
     def __init__(self):
-        self.__chrome_binary_path = getenv("CHROME_BINARY_PATH")
+        self.__chrome_binary_path = "/usr/bin/chromium-browser"
         self.__tabs: list[PydollTab] = []
         self.__navigator: Chrome | None = None
-        
-        if self.__chrome_binary_path is None:
-            raise ValueError("CHROME_BINARY_PATH environment variable is not set")
 
     async def open_tab(self) -> PydollTab:
         if self.__navigator:
@@ -39,9 +36,6 @@ class SafeResourceChrome(Navigator):
         return self.__tabs[index]
 
     def __browser_options(self) -> ChromiumOptions:
-        if self.__chrome_binary_path is None:
-            raise ValueError("CHROME_BINARY_PATH environment variable is not set")
-
         options = ChromiumOptions()
         options._start_timeout = 120 # pyright: ignore
         options.binary_location = self.__chrome_binary_path
