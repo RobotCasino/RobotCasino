@@ -23,6 +23,8 @@ class NoConstraintsChrome(Navigator):
         options.add_argument('--user-data-dir=/tmp/chrome_dev')
         options.add_argument("--window-size=1920,1080") 
 
+        options.add_argument("--user-agent=Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
+
         return options
     
     async def open_tab(self) -> PydollTab:

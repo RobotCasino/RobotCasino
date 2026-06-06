@@ -58,7 +58,7 @@ class OneWinAviator(Game):
 
     async def wait_for_aviator_iframe_to_load(self, tab: Tab) -> None:
         iframe = await tab.find_element_by_xpath_or_fail("//iframe[contains(@src, 'spribelaunch.com/aviator')]")
-        await iframe.find_element_by_css_selector_or_fail("app-bet-control")
+        # await iframe.find_element_by_css_selector_or_fail("app-bet-control")
 
 
 __ALL__ = ['OneWinAviator']

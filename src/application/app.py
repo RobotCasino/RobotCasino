@@ -8,7 +8,7 @@ from infrastructure.process.socket_server import SocketServer
 from infrastructure.process.foreground import ForegroundProcess
 from common.utils.args_parser import ArgsParser
 
-from common.constants.directories import DOWNLOAD_DIR
+from common.constants.directories import SCREENSHOT_DIR
 
 App = Typer(add_completion=False)
 
@@ -36,7 +36,7 @@ def screenshot(filename: str | None = None):
 
     res = Sender.send({
         "cmd": "screenshot",
-        "arguments": f"{DOWNLOAD_DIR}{path}",
+        "arguments": f"{SCREENSHOT_DIR}{path}",
     })
 
     if res is not None:

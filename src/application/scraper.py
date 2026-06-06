@@ -34,7 +34,7 @@ class Scraper:
 
         self.__active_tab: Tab | None = None
 
-        self.__state = Scraper.States.INITIALIZING
+        self.__state = Scraper.States.WAITING
 
         self.__scraper_information: dict[str, str] = {}
 
@@ -103,15 +103,20 @@ class Scraper:
             while True:
                 await tab.sleep(60)
 
-                if Resources.is_memory_limit_reached() and self.__is_scraper_waiting():
+                if navigator.is_optimized_for_low_memory():
+                    print("Checking memory usage...")
+
                     memory_usage_mb = Resources.bytes_to_mb(Resources.get_memory_usage_as_bytes_or_fail())
                     memory_limit_mb = Resources.bytes_to_mb(Resources.get_memory_limit_as_bytes_or_fail())
 
-                    Logger.warning(
-                        f"Memory threshold reached: {memory_usage_mb}MB / {memory_limit_mb}MB. Reloading."
-                    )
-                    
-                    break
+                    print(f"Memory usage: {memory_usage_mb}MB / {memory_limit_mb}MB")
+
+                    if Resources.is_memory_limit_reached():
+                        Logger.warning(
+                            f"Memory threshold reached: {memory_usage_mb}MB / {memory_limit_mb}MB. Reloading."
+                        )
+
+                        break
 
             await tab.reload()
             await tab.sleep(5)
