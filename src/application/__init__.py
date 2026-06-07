@@ -1,1 +1,0 @@
-from application.main import main

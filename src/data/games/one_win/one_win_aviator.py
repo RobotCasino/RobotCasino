@@ -20,6 +20,8 @@ class OneWinAviator(Game):
         super().__init__("aviator", "Aviator", "https://1win.com/casino/play/v_spribe:aviator", playing_scripts=playing_scripts, domain_scripts=game_domain_scripts)
 
     async def play(self, tab: Tab):
+        await super().play(tab)
+
         casino = self.get_casino_or_fail()
         strategy = self.get_strategy_or_fail()
 
@@ -58,7 +60,7 @@ class OneWinAviator(Game):
 
     async def wait_for_aviator_iframe_to_load(self, tab: Tab) -> None:
         iframe = await tab.find_element_by_xpath_or_fail("//iframe[contains(@src, 'spribelaunch.com/aviator')]")
-        # await iframe.find_element_by_css_selector_or_fail("app-bet-control")
+        await iframe.find_element_by_css_selector_or_fail("app-bet-control")
 
 
 __ALL__ = ['OneWinAviator']

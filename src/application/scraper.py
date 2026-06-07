@@ -83,10 +83,10 @@ class Scraper:
         tab = await browser.open_tab()
         self.__active_tab = tab
 
+        await tab.console(self.__watcher) # pyright: ignore
+
         if navigator.is_optimized_for_low_memory():
             await tab.enable_request_blocking()
-
-        await tab.console(self.__watcher) # pyright: ignore
 
         await casino.prepare_before_playing(tab)
         await strategy.prepare_before_playing(tab)
@@ -116,7 +116,12 @@ class Scraper:
                             f"Memory threshold reached: {memory_usage_mb}MB / {memory_limit_mb}MB. Reloading."
                         )
 
-                        break
+                        if self.__is_scraper_waiting():
+                            Logger.info("Scraper is waiting. Reloading immediately.")
+                            
+                            break
+                        else:
+                            Logger.info("Scraper is not waiting. Will reload on next waiting state.")
 
             await tab.reload()
             await tab.sleep(5)
@@ -144,7 +149,6 @@ class Scraper:
         lines.append("╭─ Scraper Status ─╮")
 
         if info:
-            # Human-friendly labels and aligned columns
             labels = [k.replace('_', ' ').title() for k in info.keys()]
             max_label_len = max((len(l) for l in labels), default=0)
 
@@ -185,13 +189,13 @@ class Scraper:
                 
                 Logger.info(payload)
 
-    async def __is_scraper_waiting(self) -> bool:
+    def __is_scraper_waiting(self) -> bool:
         return self.__state is self.States.WAITING
 
-    async def __is_scraper_playing(self) -> bool:
+    def __is_scraper_playing(self) -> bool:
         return self.__state is self.States.PLAYING
     
-    async def __is_scraper_observing(self) -> bool:
+    def __is_scraper_observing(self) -> bool:
         return self.__state is self.States.OBSERVING
 
     def __set_scraper_information(self, info: dict[str, str]) -> None:

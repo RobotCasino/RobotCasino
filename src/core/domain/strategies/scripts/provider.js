@@ -7,6 +7,7 @@
             this.Domain = null
             this.GameCleaner = null
             this.CasinoCleaner = null
+            this.Config = null
         }
 
         retrieve() {
@@ -16,9 +17,10 @@
             this.Domain = window.Domain || null
             this.GameCleaner = window.GameCleaner || null
             this.CasinoCleaner = window.CasinoCleaner || null
+            this.Config = window.Config || null
 
             return {
-                success: !!this.Scraper && !!this.Playground && !!this.Util && !!this.Domain && !!this.GameCleaner && !!this.CasinoCleaner,
+                success: !!this.Scraper && !!this.Playground && !!this.Util && !!this.Domain && !!this.GameCleaner && !!this.CasinoCleaner && !!this.Config,
             }
         }
 
@@ -43,6 +45,10 @@
 
             if (!this.CasinoCleaner) {
                 return { success: false, reason: 'CasinoCleaner not found' }
+            }
+
+            if (!this.Config) {
+                return { success: false, reason: 'Config not found' }
             }
 
             return { success: true }

@@ -105,17 +105,7 @@ class Tab:
     async def enable_request_blocking(
         self,
     ) -> None:
-        self.__blocked_resource_types = {ResourceType.IMAGE}
-        self.__blocked_url_substrings = (
-            "doubleclick.net",
-            "googletagmanager.com",
-            "google-analytics.com",
-            "stats.g.doubleclick.net",
-            "facebook.net",
-            "facebook.com/tr",
-            "/analytics",
-            "/collect",
-        )
+        self.__blocked_resource_types = {ResourceType.IMAGE, ResourceType.STYLESHEET, ResourceType.FONT, ResourceType.MEDIA, ResourceType.OTHER}
 
         await self.__page.enable_fetch_events(request_stage=RequestStage.REQUEST)
 
@@ -126,17 +116,11 @@ class Tab:
                 return
 
             request = params.get("request", {}) if isinstance(params, dict) else {}
-            url = request.get("url", "")
             resource_type = params.get("resourceType")
             resource_value = resource_type.value if isinstance(resource_type, ResourceType) else str(resource_type or "")
 
             should_block = resource_value in self.__blocked_resource_types
-            if not should_block and url:
-                for token in self.__blocked_url_substrings:
-                    if token in url:
-                        should_block = True
-                        break
-
+            
             try:
                 if should_block:
                     await self.__page.fail_request(request_id, ErrorReason.BLOCKED_BY_CLIENT)

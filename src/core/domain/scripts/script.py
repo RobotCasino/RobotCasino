@@ -20,4 +20,7 @@ class Script:
 
             return js
 
-        return FileReader.read(self.path)
+        js = FileReader.read(self.path)
+
+        return js
+    

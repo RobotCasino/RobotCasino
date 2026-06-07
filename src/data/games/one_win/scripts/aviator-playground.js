@@ -1,5 +1,11 @@
 (function () {
     class Playground {
+        constructor() {
+            this.iframe = this.querySelectorAsxPath("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document);
+
+            this.iframeDocument = this.iframe.contentDocument;
+        }
+
         load() {
             this.STATES = Object.freeze({
                 WAITING: 'waiting',
@@ -7,30 +13,27 @@
                 CRASHED: 'crashed',
             })
 
-            this.iframe = document.evaluate("//iframe[contains(@src, 'spribelaunch.com/aviator')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-            this.contentDocument = this.iframe ? this.iframe.contentDocument : document;
-
-            this.payoutsBlock = this.querySelector('.payouts-block')
+            this.payoutsBlock = this.querySelector('.payouts-block', this.iframeDocument)
         
             this.config(1.8)
         }
 
         bet() {
-            this.querySelector('.btn.btn-success.bet.ng-star-inserted')?.click()
+            this.querySelector('.btn.btn-success.bet.ng-star-inserted', this.iframeDocument)?.click()
         }
 
         config(autoCashout) {
-            const autoTab = this.querySelectorAsxPath("//button[contains(@class,'tab') and contains(text(),'Auto')]")
+            const autoTab = this.querySelectorAsxPath("//button[contains(@class,'tab') and contains(text(),'Auto')]", this.iframeDocument)
             
             if (autoTab) autoTab.click()
         }
 
-        querySelector(selector) {
-            return this.contentDocument.querySelector(selector)
+        querySelector(selector, contextNode) {
+            return contextNode.querySelector(selector)
         }
 
-        querySelectorAsxPath(xpath) {
-            return document.evaluate(xpath, this.contentDocument, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        querySelectorAsxPath(xpath, contextNode) {
+            return document.evaluate(xpath, contextNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         }
     }
 

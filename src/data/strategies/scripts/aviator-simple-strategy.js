@@ -15,6 +15,7 @@
             this.Util = this.Provider.Util
             this.GameCleaner = this.Provider.GameCleaner
             this.CasinoCleaner = this.Provider.CasinoCleaner
+            this.Config = this.Provider.Config
 
             this.GameCleaner.start()
             this.CasinoCleaner.start()

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from typing import TYPE_CHECKING
 
+from common.utils.metadata import Metadata
 from core.domain.strategies.strategy import Strategy
 from core.domain.casinos.casino import Casino
 from common.constants.directories import BASE_DIR
@@ -20,7 +21,7 @@ class Game(ABC):
         self.__casino: Casino | None = None
 
         self._playing_scripts = playing_scripts
-        self._domain_scripts = domain_scripts 
+        self._domain_scripts = domain_scripts
 
         self.__util_scripts: tuple['Script', ...] = (
             Script('Util Script', f'{BASE_DIR}core/domain/games/scripts/util.js'),
@@ -29,7 +30,7 @@ class Game(ABC):
 
     @abstractmethod
     async def play(self, tab: 'Tab') -> None:
-        pass
+        self._playing_scripts = (Script('Config Script', f'{BASE_DIR}core/domain/games/scripts/config.js', Metadata.to_dict()),) + self._playing_scripts
 
     def get_name(self):
         return self.__name

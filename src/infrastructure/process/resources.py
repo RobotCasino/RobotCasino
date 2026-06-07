@@ -1,4 +1,6 @@
 
+import os
+
 from common.utils.file_reader import FileReader
 from common.utils.metadata import Metadata
 
@@ -34,13 +36,42 @@ class Resources:
 
     @staticmethod
     def get_memory_usage_as_bytes() -> int | None:
-        return Resources.__read_cgroup_value(
-            (
-                "/sys/fs/cgroup/memory.current",
-                "/sys/fs/cgroup/memory/memory.usage_in_bytes",
-            )
-        )
-    
+        is_v2 = os.path.exists("/sys/fs/cgroup/memory.current")
+            
+        if is_v2:
+            try:
+                with open("/sys/fs/cgroup/memory.current", "r") as f:
+                    total_memory = int(f.read().strip())
+                    
+                stats = {}
+                with open("/sys/fs/cgroup/memory.stat", "r") as f:
+                    for line in f:
+                        key, val = line.strip().split()
+                        stats[key] = int(val)
+                    
+                inactive_file = stats.get("inactive_file", 0)
+                
+                return total_memory - inactive_file
+                    
+            except (IOError, ValueError):
+                return None
+        else:
+            try:
+                with open("/sys/fs/cgroup/memory/memory.usage_in_bytes", "r") as f:
+                    total_memory = int(f.read().strip())
+                    
+                stats = {}
+                with open("/sys/fs/cgroup/memory/memory.stat", "r") as f:
+                    for line in f:
+                        key, val = line.strip().split()
+                        stats[key] = int(val)
+                    
+                cache = stats.get("total_cache", 0)
+                return total_memory - cache
+                    
+            except (IOError, ValueError):
+                return None
+        
     @staticmethod
     def get_memory_limit_as_bytes() -> int | None:
         if Resources.__memory_limit_as_bytes is not None:

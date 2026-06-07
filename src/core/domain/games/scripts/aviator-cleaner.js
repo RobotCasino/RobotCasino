@@ -24,6 +24,7 @@
 
         removeChat() {
             this.querySelector('.chat-bar.ng-star-inserted')?.remove()
+
             const gamePlay = this.querySelector('.game-play');
             const mainContaier = this.querySelector('.main-container');
 

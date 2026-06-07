@@ -23,3 +23,7 @@ class Metadata:
     @classmethod
     def set_dictionary(cls, metadata: dict[str, str]) -> None:
         cls._metadata.update(metadata)
+
+    @classmethod
+    def to_dict(cls) -> dict[str, str]:
+        return cls._metadata.copy()
