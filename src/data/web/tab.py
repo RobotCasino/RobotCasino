@@ -105,7 +105,7 @@ class Tab:
     async def enable_request_blocking(
         self,
     ) -> None:
-        self.__blocked_resource_types = {ResourceType.IMAGE, ResourceType.STYLESHEET, ResourceType.FONT, ResourceType.MEDIA, ResourceType.OTHER}
+        self.__blocked_resource_types = {ResourceType.IMAGE, ResourceType.OTHER}
 
         await self.__page.enable_fetch_events(request_stage=RequestStage.REQUEST)
 

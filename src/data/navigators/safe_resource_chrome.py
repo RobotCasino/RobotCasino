@@ -1,19 +1,22 @@
 from pydoll.browser import Chrome
 from pydoll.browser.options import ChromiumOptions
-from pydoll.browser.tab import Tab as PydollTab
+from data.web.tab import Tab
 from os import getenv
 
 from core.domain.navigators.navigator import Navigator
+from infrastructure.logging.logger import Logger
 
 class SafeResourceChrome(Navigator):
     def __init__(self):
         self.__chrome_binary_path = "/usr/bin/chromium-browser"
-        self.__tabs: list[PydollTab] = []
+        self.__tabs: list[Tab] = []
         self.__navigator: Chrome | None = None
 
-    async def open_tab(self) -> PydollTab:
+        Logger.info("Initialized SafeResourceChrome instance")
+
+    async def open_tab(self) -> Tab:
         if self.__navigator:
-            tab = await self.__navigator.new_tab('about:blank', None)
+            tab = Tab(await self.__navigator.new_tab('about:blank', None))
             
             self.__tabs.append(tab)
             
@@ -23,13 +26,13 @@ class SafeResourceChrome(Navigator):
 
         self.__navigator = Chrome(options=options)
 
-        tab = await self.__navigator.start()
+        tab = Tab(await self.__navigator.start())
         
         self.__tabs.append(tab)
 
         return tab
 
-    def get_tab(self, index: int) -> PydollTab:
+    def get_tab(self, index: int) -> Tab:
         if index < 0 or index >= len(self.__tabs):
             raise IndexError("Tab index out of range")
         
@@ -109,6 +112,7 @@ class SafeResourceChrome(Navigator):
         options.add_argument("--js-flags=--max-old-space-size=250 --expose-gc --optimize-for-size --flush-bytecode --gc-global")
 
         options.add_argument("--user-agent=Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
+        
         return options
 
     async def close(self) -> None:
@@ -116,6 +120,10 @@ class SafeResourceChrome(Navigator):
             return
         
         await self.__navigator.close()
+
+        self.__navigator = None
+        self.__tabs.clear()
+        
     
     def is_optimized_for_low_memory(self) -> bool:
         return True

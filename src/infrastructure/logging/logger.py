@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 MAX_LOG_SIZE = 1 * 1024 * 1024  # 1 MB
 
@@ -30,9 +31,7 @@ _logger.addHandler(_stderr_handler)
 class Logger:
     @staticmethod
     def _rotate_log_if_needed(path):
-        """Truncate log file to half size when it exceeds MAX_LOG_SIZE."""
         try:
-            # Ensure the directory exists before attempting to operate on the file
             os.makedirs(os.path.dirname(path), exist_ok=True)
             
             if os.path.exists(path) and os.path.getsize(path) > MAX_LOG_SIZE:
@@ -46,21 +45,19 @@ class Logger:
 
     @staticmethod
     def log_message(message: str, level: str = "INFO") -> None:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.datetime.now(ZoneInfo("America/Mazatlan")).strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] [{level}] {message}\n"
 
-        # Rotate log if needed, then write
         Logger._rotate_log_if_needed(CONSOLE_LOG_FILE)
         with open(CONSOLE_LOG_FILE, "a", encoding="utf-8") as f:
             f.write(log_entry)
 
-        # Write to stdout via logging
         log_level = getattr(logging, level.upper(), logging.INFO)
         _logger.log(log_level, message)
 
     @staticmethod
     def log_error(error: str, exception: Optional[Exception] = None) -> None:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.datetime.now(ZoneInfo("America/Mazatlan")).strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] [ERROR] {error}\n"
 
         if exception:
@@ -68,12 +65,10 @@ class Logger:
             tb = ''.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
             log_entry += f"Traceback:\n{tb}\n"
 
-        # Rotate log if needed, then write
         Logger._rotate_log_if_needed(ERROR_LOG_FILE)
         with open(ERROR_LOG_FILE, "a", encoding="utf-8") as f:
             f.write(log_entry)
 
-        # Write to stderr via logging
         if exception:
             _logger.error(error, exc_info=exception)
         else:

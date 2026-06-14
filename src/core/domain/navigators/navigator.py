@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from pydoll.browser.tab import Tab as PydollTab
+from data.web.tab import Tab
+
 
 class Navigator(ABC):
     
     @abstractmethod
-    async def open_tab(self) -> PydollTab:
+    async def open_tab(self) -> Tab:
         pass
 
     @abstractmethod

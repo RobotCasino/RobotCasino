@@ -1,7 +1,7 @@
 from typer import Context
 
 from application.app import App
-from application.scraper import Scraper
+from core.scraper.scraper import Scraper
 from infrastructure.process.socket_server import SocketServer
 from infrastructure.process.foreground import ForegroundProcess
 from common.utils.args_parser import ArgsParser

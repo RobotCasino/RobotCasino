@@ -1,12 +1,11 @@
 import json
 from enum import Enum
-from asyncio import StreamReader, StreamWriter
+from asyncio import StreamReader, StreamWriter, sleep
 from infrastructure.process.resources import Resources
 from infrastructure.logging.logger import Logger
 from infrastructure.ipc.receiver import Receiver
 from infrastructure.process.foreground import ForegroundProcess
 from data.web.tab import Tab
-from data.web.browser import Browser
 from data.navigators.navigators import Navigators
 from data.games.games import Games
 from data.casinos.casinos import Casinos
@@ -68,7 +67,6 @@ class Scraper:
             await writer.wait_closed()
 
     async def run(self):
-        navigator = Navigators.get_navigator_or_fail(self.__browser)
         casino = Casinos.get_casino_or_fail(self.__casino)
         game = Games.get_game_or_fail(self.__casino, self.__game)
         strategy = Strategies.get_strategy_or_fail(self.__game, self.__strategy)
@@ -78,19 +76,6 @@ class Scraper:
 
         game.is_ready_or_fail()
 
-        browser = Browser(navigator)
-
-        tab = await browser.open_tab()
-        self.__active_tab = tab
-
-        await tab.console(self.__watcher) # pyright: ignore
-
-        if navigator.is_optimized_for_low_memory():
-            await tab.enable_request_blocking()
-
-        await casino.prepare_before_playing(tab)
-        await strategy.prepare_before_playing(tab)
-
         self.__set_scraper_information({
             'game': game.get_display_name(),
             'casino': casino.get_display_name(),
@@ -98,6 +83,18 @@ class Scraper:
         })
 
         while True:
+            navigator = Navigators.get_navigator_or_fail(self.__browser)
+
+            tab = await navigator.open_tab()
+            self.__active_tab = tab
+
+            await tab.console(self.__watcher) # pyright: ignore
+
+            if navigator.is_optimized_for_low_memory():
+                await tab.enable_request_blocking()
+
+            await casino.prepare_before_playing(tab)
+            await strategy.prepare_before_playing(tab)
             await game.play(tab)
 
             while True:
@@ -123,8 +120,19 @@ class Scraper:
                         else:
                             Logger.info("Scraper is not waiting. Will reload on next waiting state.")
 
-            await tab.reload()
-            await tab.sleep(5)
+            try:
+                if self.__active_tab:
+                    await self.__active_tab.close()
+            except Exception as e:
+                Logger.warning(f"Could not close tab cleanly (process might be dead): {e}")
+
+            try:
+                await navigator.close()
+            except Exception as e:
+                Logger.warning(f"Could not close navigator cleanly: {e}")
+
+            print("Cooling down for 10 seconds...")
+            await sleep(10)
 
     async def close(self):
         if self.__active_tab:
