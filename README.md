@@ -12,11 +12,13 @@ The CLI is Typer. The package is `robotcasino-robot` 1.0.0 (`src/pyproject.toml`
 robotcasino run <browser> <casino> <game> <strategy> [--KEY value ...]
 ```
 
-| Browser | Casino | Game | Strategy argument | What the code does |
-| --- | --- | --- | --- | --- |
-| `safe-resource-chrome` | `one-win` | `aviator` | `simple-strategy` | Opens 1win Aviator (`https://1win.com/casino/play/v_spribe:aviator`), sets the `1w_token` cookie from `--SESSION_TOKEN`, selects USD, and injects scripts. The strategy logs new payout text. It does not place bets. |
-| `no-constraints-chrome` | `mystake` | `dino` | `simple-strategy` | Sets an `AppAuth` cookie from `--SESSION_TOKEN` and opens a Mystake game URL. The strategy has no scripts. |
-| either browser | `test` | `aviator` | `simple-strategy` | Opens `https://blankslate.io/`. Its script paths do not match the files under `src/data/games/test/scripts/`. |
+Browsers (`safe-resource-chrome`, `no-constraints-chrome`) are independent of the casino. These are the casino/game/strategy names the code accepts:
+
+| Casino | Game | Strategy argument | What the code does |
+| --- | --- | --- | --- |
+| `one-win` | `aviator` | `simple-strategy` | Opens 1win Aviator (`https://1win.com/casino/play/v_spribe:aviator`), sets the `1w_token` cookie from `--SESSION_TOKEN`, selects USD, and injects scripts. The strategy logs new payout text. It does not place bets. |
+| `mystake` | `dino` | `simple-strategy` | Sets an `AppAuth` cookie from `--SESSION_TOKEN` and opens a Mystake game URL. The strategy has no scripts. |
+| `test` | `aviator` | `simple-strategy` | Opens `https://blankslate.io/`. Its script paths do not match the files under `src/data/games/test/scripts/`. |
 
 `safe-resource-chrome` is a reduced Chromium profile. About once a minute it reads cgroup memory and restarts the browser when usage reaches `MEMORY_RELOAD_RATIO` times the limit. `no-constraints-chrome` skips that check. Both look for the browser at `/usr/bin/chromium-browser`. `HEADLESS` defaults to `1` (headless). Any other value, including `0`, shows a window.
 
